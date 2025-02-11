@@ -21,6 +21,7 @@ final class ExplorerViewController: UIViewController {
     private func setupView() {
         view.backgroundColor = AppColorEnum.appBackground.color
         view.addSubviews(explorerListView)
+        title = "Platzi Fake Store"
     }
     
     private func setConstraints() {
