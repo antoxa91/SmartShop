@@ -10,7 +10,7 @@ import UIKit
 enum AppColorEnum {
     case appBackground
     case cellBackground
-    case text
+    case label
     
     var color: UIColor {
         switch self {
@@ -18,7 +18,7 @@ enum AppColorEnum {
             return .systemBackground
         case .cellBackground:
             return .secondarySystemBackground
-        case .text:
+        case .label:
             return .label
         }
     }
