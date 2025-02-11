@@ -8,11 +8,28 @@
 import UIKit
 
 final class ExplorerViewController: UIViewController {
+    private lazy var explorerListView = ExplorerListView()
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        view.backgroundColor = .red
+        setupView()
+        setConstraints()
+    }
+    
+    // MARK: Setup
+    private func setupView() {
+        view.backgroundColor = AppColorEnum.appBackground.color
+        view.addSubviews(explorerListView)
+    }
+    
+    private func setConstraints() {
+        NSLayoutConstraint.activate([
+            explorerListView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            explorerListView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
+            explorerListView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
+            explorerListView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
+        ])
     }
 }
 
