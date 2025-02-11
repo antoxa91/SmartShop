@@ -73,18 +73,27 @@ final class SearchTextField: UITextField {
                 self.filterButton.transform = .identity
             }
         }
-        
     }
 }
 
 // MARK: - UITextFieldDelegate
 extension SearchTextField: UITextFieldDelegate {
     func textFieldDidBeginEditing(_ textField: UITextField) {
+        UIView.animate(withDuration: 0.3) {
+            self.searchIconView.transform = CGAffineTransform(scaleX: 1.2, y: 1.2)
+            self.searchIconView.alpha = 0.7
+        }
+        
         textField.placeholder = ""
         rightView?.isHidden = true
     }
     
     func textFieldDidEndEditing(_ textField: UITextField) {
+        UIView.animate(withDuration: 0.3) {
+            self.searchIconView.transform = .identity
+            self.searchIconView.alpha = 1.0
+        }
+        
         textField.placeholder = "Search"
         rightView?.isHidden = false
     }
