@@ -24,6 +24,7 @@ final class ExplorerListCollectionViewCell: UICollectionViewCell {
         imageView.clipsToBounds = true
         imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.backgroundColor = AppColorEnum.cellBackground.color
+        imageView.image = .init(systemName: "photo")
         return imageView
     }()
     

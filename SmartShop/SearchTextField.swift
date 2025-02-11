@@ -66,7 +66,14 @@ final class SearchTextField: UITextField {
     }
     
     @objc private func filterButtonTapped() {
-        print(#function)
+        UIView.animate(withDuration: 0.15, animations: {
+            self.filterButton.transform = CGAffineTransform(rotationAngle: .pi)
+        }) { _ in
+            UIView.animate(withDuration: 0.15) {
+                self.filterButton.transform = .identity
+            }
+        }
+        
     }
 }
 
