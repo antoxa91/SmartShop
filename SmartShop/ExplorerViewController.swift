@@ -9,10 +9,10 @@ import UIKit
 
 final class ExplorerViewController: UIViewController {
     private lazy var explorerListView = ExplorerListView()
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        
         setupView()
         setConstraints()
     }

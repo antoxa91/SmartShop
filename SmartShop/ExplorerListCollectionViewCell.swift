@@ -15,8 +15,8 @@ protocol ConfigurableViewProtocol {
 
 final class ExplorerListCollectionViewCell: UICollectionViewCell {
     static let identifier = String(describing: ExplorerListCollectionViewCell.self)
-    private let cornerRadius: CGFloat = 50
-
+    private let cornerRadius: CGFloat = 16
+    
     // MARK: Private UI Propertie
     private lazy var productImageView: UIImageView = {
         let imageView = UIImageView()

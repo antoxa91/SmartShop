@@ -26,7 +26,7 @@ final class SearchTextField: UITextField {
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
-        
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         setup()
@@ -52,18 +52,18 @@ final class SearchTextField: UITextField {
         translatesAutoresizingMaskIntoConstraints = false
     }
     
-      override func leftViewRect(forBounds bounds: CGRect) -> CGRect {
-          var rect = super.leftViewRect(forBounds: bounds)
-          rect.origin.x += 10
-          rect.size.width += 10
-          return rect
-      }
-      
-      override func rightViewRect(forBounds bounds: CGRect) -> CGRect {
-          var rect = super.rightViewRect(forBounds: bounds)
-          rect.origin.x -= 10
-          return rect
-      }
+    override func leftViewRect(forBounds bounds: CGRect) -> CGRect {
+        var rect = super.leftViewRect(forBounds: bounds)
+        rect.origin.x += 10
+        rect.size.width += 10
+        return rect
+    }
+    
+    override func rightViewRect(forBounds bounds: CGRect) -> CGRect {
+        var rect = super.rightViewRect(forBounds: bounds)
+        rect.origin.x -= 10
+        return rect
+    }
     
     @objc private func filterButtonTapped() {
         print(#function)
@@ -89,7 +89,7 @@ extension SearchTextField: UITextFieldDelegate {
             
             return false
         }
-
+        
         return true
     }
 }
