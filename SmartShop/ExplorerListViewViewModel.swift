@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import OSLog
 
 final class ExplorerListViewViewModel: NSObject {
     private var products: [Product] = []
@@ -20,6 +21,7 @@ extension ExplorerListViewViewModel: UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ExplorerListCollectionViewCell.identifier, for: indexPath) as? ExplorerListCollectionViewCell else {
+            Logger.cell.error("Failed to dequeue ExplorerListCollectionViewCell")
             return UICollectionViewCell()
         }
         return cell
