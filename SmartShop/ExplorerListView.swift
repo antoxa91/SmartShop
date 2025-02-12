@@ -77,7 +77,7 @@ final class ExplorerListView: UIView {
             searchTextField.trailingAnchor.constraint(equalTo: basketView.leadingAnchor, constant: -Constants.elementInset),
             searchTextField.heightAnchor.constraint(equalToConstant: Constants.elementHeight),
             
-            basketView.topAnchor.constraint(equalTo: topAnchor, constant: Constants.elementInset),
+            basketView.topAnchor.constraint(equalTo: topAnchor),
             basketView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -Constants.elementInset),
             basketView.widthAnchor.constraint(equalToConstant: Constants.elementHeight),
             basketView.heightAnchor.constraint(equalToConstant: Constants.elementHeight),
