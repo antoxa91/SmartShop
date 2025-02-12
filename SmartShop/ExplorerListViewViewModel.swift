@@ -64,3 +64,30 @@ extension ExplorerListViewViewModel: UICollectionViewDelegateFlowLayout {
         return CGSize(width: width, height: width * 1.15)
     }
 }
+
+
+extension ExplorerListViewViewModel: UITextFieldDelegate {
+    func textFieldDidBeginEditing(_ textField: UITextField) {
+        textField.placeholder = ""
+    }
+    
+    func textFieldDidEndEditing(_ textField: UITextField) {
+        textField.placeholder = "Search item or brands..."
+    }
+    
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        textField.resignFirstResponder()
+        guard let searchText = textField.text, !searchText.isEmpty else {
+            products = []
+            delegate?.didLoadInitialProduct()
+            return false
+        }
+        
+        networkService.filterBy(title: searchText, parameters: nil) { [weak self] products in
+            self?.products = products
+            self?.delegate?.didLoadInitialProduct()
+        }
+        
+        return true
+    }
+}

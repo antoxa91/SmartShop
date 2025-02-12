@@ -8,6 +8,7 @@
 import UIKit
 
 final class SearchTextField: UITextField {
+    
     // MARK: Private UI Properties
     private lazy var searchIconView: UIImageView = {
         let imageView = UIImageView()
@@ -54,7 +55,6 @@ final class SearchTextField: UITextField {
         backgroundColor = AppColorEnum.tfBg.color
         layer.cornerRadius = 15
         returnKeyType = .search
-        delegate = self
         
         leftView = searchIconView
         leftViewMode = .always
@@ -86,39 +86,5 @@ final class SearchTextField: UITextField {
                 self.filterButton.transform = .identity
             }
         }
-    }
-}
-
-// MARK: - UITextFieldDelegate
-extension SearchTextField: UITextFieldDelegate {
-    func textFieldDidBeginEditing(_ textField: UITextField) {
-        UIView.animate(withDuration: 0.3) {
-            self.searchIconView.transform = CGAffineTransform(scaleX: 1.2, y: 1.2)
-            self.searchIconView.alpha = 0.7
-        }
-        
-        textField.placeholder = ""
-        rightView?.isHidden = true
-    }
-    
-    func textFieldDidEndEditing(_ textField: UITextField) {
-        UIView.animate(withDuration: 0.3) {
-            self.searchIconView.transform = .identity
-            self.searchIconView.alpha = 1.0
-        }
-        
-        textField.placeholder = "Search item or brands..."
-        rightView?.isHidden = false
-    }
-    
-    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        textField.resignFirstResponder()
-        
-        guard let searchText = textField.text, !searchText.isEmpty else {
-            
-            return false
-        }
-        
-        return true
     }
 }

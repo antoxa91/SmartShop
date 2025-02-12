@@ -44,6 +44,7 @@ final class ExplorerListView: UIView {
         setConstraints()
         viewModel.delegate = self
         viewModel.fetchProducts()
+        searchTextField.delegate = viewModel
     }
     
     @available(*, unavailable)
