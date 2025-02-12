@@ -9,7 +9,7 @@ import UIKit
 import OSLog
 
 protocol ImageLoaderProtocol {
-    func fetchImage(with url: URL, completion: @escaping (UIImage) -> Void)
+    func fetchImage(with url: URL, completion: @escaping (UIImage?) -> Void)
 }
 
 final class ImageLoaderService {
@@ -42,7 +42,12 @@ final class ImageLoaderService {
     private func handleResponse(_ response: HTTPURLResponse, data: Data, completion: @escaping (Result<Data, NetworkError>) -> Void) {
         switch response.statusCode {
         case 200..<300:
-            completion(.success(data))
+            if data.isEmpty {
+                Logger.imageLoader.error("Received empty data for URL: \(response.url?.absoluteString ?? "Unknown URL")")
+                completion(.failure(.badData))
+            } else {
+                completion(.success(data))
+            }
         case 404:
             Logger.imageLoader.error("Resource not found at URL: \(response.url?.absoluteString ?? "Unknown URL")")
             completion(.failure(.notFound))
@@ -58,15 +63,20 @@ final class ImageLoaderService {
 
 // MARK: - ImageLoaderProtocol
 extension ImageLoaderService: ImageLoaderProtocol {
-    func fetchImage(with url: URL, completion: @escaping (UIImage) -> Void) {
+    func fetchImage(with url: URL, completion: @escaping (UIImage?) -> Void) {
         downloadData(url) { result in
             DispatchQueue.main.async {
                 switch result {
                 case .success(let data):
-                    guard let image = UIImage(data: data) else { return }
+                    guard let image = UIImage(data: data) else {
+                        Logger.imageLoader.error("Failed to create image from data for URL: \(url)")
+                        completion(nil)
+                        return
+                    }
                     completion(image)
                 case .failure(let failure):
                     Logger.imageLoader.error("Error loading product image from \(url): \(failure.localizedDescription)")
+                    completion(nil)
                 }
             }
         }
