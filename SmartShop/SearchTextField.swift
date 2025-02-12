@@ -7,8 +7,13 @@
 
 import UIKit
 
+protocol BottomSheetDelegate: AnyObject {
+    func showBottomSheet()
+}
+
 final class SearchTextField: UITextField {
-    
+    weak var bottomSheetDelegate: BottomSheetDelegate?
+
     // MARK: Private UI Properties
     private lazy var searchIconView: UIImageView = {
         let imageView = UIImageView()
@@ -86,5 +91,7 @@ final class SearchTextField: UITextField {
                 self.filterButton.transform = .identity
             }
         }
+        
+        bottomSheetDelegate?.showBottomSheet()
     }
 }
