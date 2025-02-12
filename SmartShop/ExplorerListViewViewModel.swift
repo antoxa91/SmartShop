@@ -14,6 +14,10 @@ protocol ExplorerListViewViewModelDelegate: AnyObject {
     func didSelectProduct(_ character: Product)
 }
 
+protocol ProductFetchable {
+    func fetchProducts()
+}
+
 final class ExplorerListViewViewModel: NSObject {
     private let networkService: ProductsLoader
     public weak var delegate: ExplorerListViewViewModelDelegate?
@@ -22,7 +26,10 @@ final class ExplorerListViewViewModel: NSObject {
     init(networkService: ProductsLoader) {
         self.networkService = networkService
     }
-    
+}
+
+// MARK: - ProductFetchable
+extension ExplorerListViewViewModel: ProductFetchable {
     func fetchProducts() {
         networkService.fetchInitialProducts {
             DispatchQueue.main.async {
@@ -32,7 +39,6 @@ final class ExplorerListViewViewModel: NSObject {
         }
     }
 }
-
 
 // MARK: - UICollectionViewDataSource
 extension ExplorerListViewViewModel: UICollectionViewDataSource {

@@ -8,7 +8,7 @@
 import UIKit
 
 final class SearchTextField: UITextField {
-    
+    // MARK: Private UI Properties
     private lazy var searchIconView: UIImageView = {
         let imageView = UIImageView()
         imageView.tintColor = AppColorEnum.tint.color
@@ -27,6 +27,7 @@ final class SearchTextField: UITextField {
         return button
     }()
     
+    // MARK: Init
     override init(frame: CGRect) {
         super.init(frame: frame)
         setup()
@@ -37,6 +38,7 @@ final class SearchTextField: UITextField {
         fatalError("init(coder:) has not been implemented")
     }
     
+    // MARK: Setup
     private func setup() {
         let placeholderAttributes = NSAttributedString(
             string: "Search item or brands...",
@@ -75,6 +77,7 @@ final class SearchTextField: UITextField {
         return rect
     }
     
+    // MARK: Action
     @objc private func filterButtonTapped() {
         UIView.animate(withDuration: 0.15, animations: {
             self.filterButton.transform = CGAffineTransform(rotationAngle: .pi)
