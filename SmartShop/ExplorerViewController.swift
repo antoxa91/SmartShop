@@ -29,7 +29,7 @@ final class ExplorerViewController: UIViewController {
             explorerListView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             explorerListView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
             explorerListView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
-            explorerListView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
+            explorerListView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ])
     }
 }
