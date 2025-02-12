@@ -45,7 +45,7 @@ extension ExplorerListViewViewModel: UICollectionViewDataSource {
             Logger.cell.error("Failed to dequeue ExplorerListCollectionViewCell")
             return UICollectionViewCell()
         }
-        let product = products[indexPath.item] 
+        let product = products[indexPath.item]
         cell.configure(with: product)
         return cell
     }

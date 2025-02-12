@@ -14,7 +14,7 @@ final class ExplorerListView: UIView {
         static let elementHeight: CGFloat = 40
     }
     
-    private let viewModel = ExplorerListViewViewModel()
+    private let viewModel: ExplorerListViewViewModel
     
     // MARK: Private UI Properties
     private lazy var collectionView: UICollectionView = {
@@ -24,6 +24,7 @@ final class ExplorerListView: UIView {
         
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.translatesAutoresizingMaskIntoConstraints = false
+        collectionView.backgroundColor = AppColorEnum.collectionView.color
         collectionView.register(ExplorerListCollectionViewCell.self,
                                 forCellWithReuseIdentifier: ExplorerListCollectionViewCell.identifier)
         return collectionView
@@ -34,10 +35,14 @@ final class ExplorerListView: UIView {
     
     // MARK: Init
     override init(frame: CGRect) {
+        let networkService: ProductsLoader = NetworkService() // Создаем экземпляр NetworkService
+        self.viewModel = ExplorerListViewViewModel(networkService: networkService) // Передаем его в ViewModel
         super.init(frame: frame)
         setupSubviews()
         setupCollectionView()
         setConstraints()
+        viewModel.delegate = self
+        viewModel.fetchProducts()
     }
     
     @available(*, unavailable)
@@ -56,6 +61,14 @@ final class ExplorerListView: UIView {
         translatesAutoresizingMaskIntoConstraints = false
     }
     
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        collectionView.layer.borderWidth = 4
+        collectionView.layer.borderColor = AppColorEnum.collectionView.color.cgColor
+        collectionView.layer.cornerRadius = 20
+        collectionView.layer.maskedCorners = [.layerMaxXMinYCorner, .layerMinXMinYCorner]
+    }
+    
     private func setConstraints() {
         NSLayoutConstraint.activate([
             searchTextField.topAnchor.constraint(equalTo: topAnchor),
@@ -63,7 +76,7 @@ final class ExplorerListView: UIView {
             searchTextField.trailingAnchor.constraint(equalTo: basketView.leadingAnchor, constant: -Constants.elementInset),
             searchTextField.heightAnchor.constraint(equalToConstant: Constants.elementHeight),
             
-            basketView.topAnchor.constraint(equalTo: topAnchor),
+            basketView.topAnchor.constraint(equalTo: topAnchor, constant: Constants.elementInset),
             basketView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -Constants.elementInset),
             basketView.widthAnchor.constraint(equalToConstant: Constants.elementHeight),
             basketView.heightAnchor.constraint(equalToConstant: Constants.elementHeight),
@@ -73,5 +86,20 @@ final class ExplorerListView: UIView {
             collectionView.trailingAnchor.constraint(equalTo: trailingAnchor),
             collectionView.bottomAnchor.constraint(equalTo: bottomAnchor)
         ])
+    }
+}
+
+// MARK: - ExplorerListViewViewModelDelegate
+extension ExplorerListView: ExplorerListViewViewModelDelegate {
+    func didLoadInitialProduct() {
+        collectionView.reloadData()
+    }
+    
+    func didLoadMoreProducts(with newIndexPaths: [IndexPath]) {
+        //
+    }
+    
+    func didSelectProduct(_ character: Product) {
+        //
     }
 }
