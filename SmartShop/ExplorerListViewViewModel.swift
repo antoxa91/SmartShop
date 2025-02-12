@@ -8,8 +8,29 @@
 import UIKit
 import OSLog
 
+protocol ExplorerListViewViewModelDelegate: AnyObject {
+    func didLoadInitialProduct()
+    func didLoadMoreProducts(with newIndexPaths: [IndexPath])
+    func didSelectProduct(_ character: Product)
+}
+
 final class ExplorerListViewViewModel: NSObject {
+    private let networkService: ProductsLoader
+    public weak var delegate: ExplorerListViewViewModelDelegate?
     private var products: [Product] = []
+    
+    init(networkService: ProductsLoader) {
+        self.networkService = networkService
+    }
+    
+    func fetchProducts() {
+        networkService.fetchInitialProducts {
+            DispatchQueue.main.async {
+                self.products = self.networkService.products
+                self.delegate?.didLoadInitialProduct()
+            }
+        }
+    }
 }
 
 
@@ -24,6 +45,8 @@ extension ExplorerListViewViewModel: UICollectionViewDataSource {
             Logger.cell.error("Failed to dequeue ExplorerListCollectionViewCell")
             return UICollectionViewCell()
         }
+        let product = products[indexPath.item]
+        cell.configure(with: product)
         return cell
     }
 }

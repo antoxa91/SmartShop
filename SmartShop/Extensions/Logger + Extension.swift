@@ -13,4 +13,5 @@ extension Logger {
     static let network = Logger(subsystem: appIdentifier, category: "network")
     static let appDelegate = Logger(subsystem: appIdentifier, category: "appDelegate")
     static let cell = Logger(subsystem: appIdentifier, category: "cellForItemAt")
+    static let imageLoader = Logger(subsystem: appIdentifier, category: "ImageLoader")
 }

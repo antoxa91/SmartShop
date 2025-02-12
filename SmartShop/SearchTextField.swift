@@ -11,7 +11,7 @@ final class SearchTextField: UITextField {
     
     private lazy var searchIconView: UIImageView = {
         let imageView = UIImageView()
-        imageView.tintColor = AppColorEnum.label.color
+        imageView.tintColor = AppColorEnum.tint.color
         imageView.contentMode = .scaleAspectFit
         imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.image = .init(systemName: "magnifyingglass")
@@ -21,7 +21,7 @@ final class SearchTextField: UITextField {
     private lazy var filterButton: UIButton = {
         let button = UIButton(type: .system)
         button.setImage(UIImage(systemName: "slider.horizontal.3"), for: .normal)
-        button.tintColor = AppColorEnum.label.color
+        button.tintColor = AppColorEnum.tint.color
         button.addTarget(self, action: #selector(filterButtonTapped), for: .touchUpInside)
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
@@ -38,8 +38,18 @@ final class SearchTextField: UITextField {
     }
     
     private func setup() {
-        placeholder = "Search"
-        backgroundColor = AppColorEnum.cellBackground.color
+        let placeholderAttributes = NSAttributedString(
+            string: "Search item or brands...",
+            attributes: [.foregroundColor: AppColorEnum.tint.color]
+        )
+        let textAttributes: [NSAttributedString.Key: Any] = [
+            .foregroundColor: UIColor.white,
+            .font: UIFont.systemFont(ofSize: 16)
+        ]
+        attributedPlaceholder = placeholderAttributes
+        defaultTextAttributes = textAttributes
+        
+        backgroundColor = AppColorEnum.tfBg.color
         layer.cornerRadius = 15
         returnKeyType = .search
         delegate = self
@@ -73,19 +83,28 @@ final class SearchTextField: UITextField {
                 self.filterButton.transform = .identity
             }
         }
-        
     }
 }
 
 // MARK: - UITextFieldDelegate
 extension SearchTextField: UITextFieldDelegate {
     func textFieldDidBeginEditing(_ textField: UITextField) {
+        UIView.animate(withDuration: 0.3) {
+            self.searchIconView.transform = CGAffineTransform(scaleX: 1.2, y: 1.2)
+            self.searchIconView.alpha = 0.7
+        }
+        
         textField.placeholder = ""
         rightView?.isHidden = true
     }
     
     func textFieldDidEndEditing(_ textField: UITextField) {
-        textField.placeholder = "Search"
+        UIView.animate(withDuration: 0.3) {
+            self.searchIconView.transform = .identity
+            self.searchIconView.alpha = 1.0
+        }
+        
+        textField.placeholder = "Search item or brands..."
         rightView?.isHidden = false
     }
     

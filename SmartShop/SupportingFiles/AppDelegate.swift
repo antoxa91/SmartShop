@@ -6,19 +6,25 @@
 //
 
 import UIKit
+import OSLog
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
-
+    
     var window: UIWindow?
     var navigationController: UINavigationController?
-
+    
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         window = UIWindow(frame: UIScreen.main.bounds)
-        navigationController = UINavigationController(rootViewController: ExplorerViewController())
-        window?.rootViewController = navigationController
         window?.makeKeyAndVisible()
         
+        do {
+            let assembly = ExplorerViewControllerAssembly(networkService: NetworkService(),
+                                                          imageLoader: ImageLoaderService())
+            window?.rootViewController = try assembly.create()
+        } catch {
+            Logger.appDelegate.error("Cant create ExplorerViewController: \(error.localizedDescription)")
+        }
         return true
     }
 }
