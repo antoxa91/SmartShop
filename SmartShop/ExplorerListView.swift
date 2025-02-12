@@ -15,6 +15,7 @@ final class ExplorerListView: UIView {
     }
     
     private let viewModel: ExplorerListViewViewModel
+    private let imageLoader: ImageLoaderProtocol
     
     // MARK: Private UI Properties
     private lazy var collectionView: UICollectionView = {
@@ -34,10 +35,10 @@ final class ExplorerListView: UIView {
     private lazy var basketView = BasketView()
     
     // MARK: Init
-    override init(frame: CGRect) {
-        let networkService: ProductsLoader = NetworkService() // Создаем экземпляр NetworkService
-        self.viewModel = ExplorerListViewViewModel(networkService: networkService) // Передаем его в ViewModel
-        super.init(frame: frame)
+    init(networkService: ProductsLoader, imageLoader: ImageLoaderProtocol) {
+        self.viewModel = ExplorerListViewViewModel(networkService: networkService)
+        self.imageLoader = imageLoader
+        super.init(frame: .zero)
         setupSubviews()
         setupCollectionView()
         setConstraints()

@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import OSLog
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -15,23 +16,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         window = UIWindow(frame: UIScreen.main.bounds)
-        navigationController = UINavigationController(rootViewController: ExplorerViewController())
-        window?.rootViewController = navigationController
         window?.makeKeyAndVisible()
         
-        configureNavigationBarAppearance()
-        
+        do {
+            let assembly = ExplorerViewControllerAssembly(networkService: NetworkService(),
+                                                          imageLoader: ImageLoaderService())
+            window?.rootViewController = try assembly.create()
+        } catch {
+            Logger.appDelegate.error("Cant create ExplorerViewController: \(error.localizedDescription)")
+        }
         return true
-    }
-    
-    private func configureNavigationBarAppearance() {
-        let appearance = UINavigationBarAppearance()
-        appearance.configureWithOpaqueBackground()
-        appearance.backgroundColor = AppColorEnum.appBackground.color
-        
-        UINavigationBar.appearance().standardAppearance = appearance
-        UINavigationBar.appearance().scrollEdgeAppearance = appearance
-        UINavigationBar.appearance().compactAppearance = appearance
     }
 }
 
