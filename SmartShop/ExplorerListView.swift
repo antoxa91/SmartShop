@@ -64,9 +64,9 @@ final class ExplorerListView: UIView {
     
     override func layoutSubviews() {
         super.layoutSubviews()
-        collectionView.layer.borderWidth = 4
+        collectionView.layer.borderWidth = 8
         collectionView.layer.borderColor = AppColorEnum.collectionView.color.cgColor
-        collectionView.layer.cornerRadius = 20
+        collectionView.layer.cornerRadius = 14
         collectionView.layer.maskedCorners = [.layerMaxXMinYCorner, .layerMinXMinYCorner]
     }
     
