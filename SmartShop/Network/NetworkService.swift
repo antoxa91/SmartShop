@@ -8,19 +8,10 @@
 import Foundation
 import OSLog
 
-struct FilterParameters {
-    let price = "price"
-    let priceMin = "price_min"
-    let priceMax = "price_max"
-    let categoryId = "categoryId"
-    // + join filter
-}
-
 protocol ProductsLoader: AnyObject {
     func fetchInitialProducts(completion: @escaping () -> Void)
-    func filterBy(title: String?,
-                  parameters: FilterParameters?,
-                  completion: @escaping ([Product]) -> Void)
+    func filterByTitle(_ title: String?, completion: @escaping ([Product]) -> Void)
+    func filterByParameters(_ parameters: FilterParameters?, completion: @escaping ([Product]) -> Void)
     var products: [Product] { get }
 }
 
@@ -37,9 +28,8 @@ final class NetworkService {
         static let priceMin = "price_min"
         static let priceMax = "price_max"
         static let categoryId = "categoryId"
-        // + join filter
     }
-    /// https://api.escuelajs.co/api/v1/products/?title=Table
+    
     private let decoder = JSONDecoder()
     private let session: URLSession
     
@@ -100,7 +90,7 @@ final class NetworkService {
 extension NetworkService: ProductsLoader {
     func fetchInitialProducts(completion: @escaping () -> Void) {
         guard let url = buildURL(queryItems: nil) else { return }
-        
+
         fetchData(awaiting: [Product].self, url: url) {[weak self] result in
             switch result {
             case .success(let response):
@@ -115,19 +105,31 @@ extension NetworkService: ProductsLoader {
         }
     }
     
-    func filterBy(title: String? = nil,
-                  parameters: FilterParameters? = nil,
-                  completion: @escaping ([Product]) -> Void) {
-        guard let url = buildURL(queryItems: [
-            URLQueryItem(name: ConstantsQueryItem.title, value: title),
+    func filterByTitle(_ title: String?, completion: @escaping ([Product]) -> Void) {
+        let queryItems = [
+            URLQueryItem(name: ConstantsQueryItem.title, value: title)
+        ]
+        filterProducts(with: queryItems, completion: completion)
+    }
+    
+    func filterByParameters(_ parameters: FilterParameters?, completion: @escaping ([Product]) -> Void) {
+        let queryItems = [
             URLQueryItem(name: ConstantsQueryItem.price, value: parameters?.price),
             URLQueryItem(name: ConstantsQueryItem.priceMin, value: parameters?.priceMin),
             URLQueryItem(name: ConstantsQueryItem.priceMax, value: parameters?.priceMax),
             URLQueryItem(name: ConstantsQueryItem.categoryId, value: parameters?.categoryId)
-        ]) else {
+        ]
+        
+        filterProducts(with: queryItems, completion: completion)
+    }
+    
+    private func filterProducts(with queryItems: [URLQueryItem], completion: @escaping ([Product]) -> Void) {
+        guard let url = buildURL(queryItems: queryItems) else {
+            Logger.network.error("Failed to build URL for filtering with query items: \(queryItems)")
+            completion([])
             return
         }
-        
+
         fetchData(awaiting: [Product].self, url: url) { result in
             switch result {
             case .success(let response):
@@ -138,7 +140,7 @@ extension NetworkService: ProductsLoader {
                 DispatchQueue.main.async {
                     completion([])
                 }
-                Logger.network.error ("I can’t download the list of filtered products: \(failure.localizedDescription)")
+                Logger.network.error("I can’t download the list of filtered products: \(failure.localizedDescription)")
             }
         }
     }
