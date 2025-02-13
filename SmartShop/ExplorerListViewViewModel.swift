@@ -24,7 +24,6 @@ final class ExplorerListViewViewModel: NSObject {
     public weak var delegate: ExplorerListViewViewModelDelegate?
     let networkService: ProductsLoader
     private var products: [Product] = []
-    private var searchHistory: [String] = []
     
     init(networkService: ProductsLoader) {
         self.networkService = networkService
@@ -93,6 +92,11 @@ extension ExplorerListViewViewModel: UICollectionViewDelegateFlowLayout {
 extension ExplorerListViewViewModel: UITextFieldDelegate {
     func textFieldDidBeginEditing(_ textField: UITextField) {
         textField.placeholder = ""
+        
+        let searchHistory = SearchHistoryManager.shared.getSearchHistory()
+          if let searchTextField = textField as? SearchTextField {
+              searchTextField.dropdownTableView.updateSearchHistory(searchHistory)
+          }
     }
     
     func textFieldDidEndEditing(_ textField: UITextField) {
@@ -111,6 +115,7 @@ extension ExplorerListViewViewModel: UITextFieldDelegate {
             self?.delegate?.didLoadInitialProduct()
         }
         
+        SearchHistoryManager.shared.addSearchQuery(searchText)
         return true
     }
 }
