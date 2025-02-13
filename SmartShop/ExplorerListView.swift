@@ -52,6 +52,18 @@ final class ExplorerListView: UIView {
         viewModel.fetchProducts()
         searchTextField.delegate = viewModel
         searchTextField.bottomSheetDelegate = self
+        setupTapGestureRecognizer()
+    }
+    
+    private func setupTapGestureRecognizer() {
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboardAndSearchHistory))
+        tapGesture.cancelsTouchesInView = false
+        addGestureRecognizer(tapGesture)
+    }
+
+    @objc private func dismissKeyboardAndSearchHistory(_ gesture: UITapGestureRecognizer) {
+        searchTextField.resignFirstResponder()
+        searchTextField.dropdownTableView.isHidden = true
     }
     
     @available(*, unavailable)
@@ -102,6 +114,7 @@ final class ExplorerListView: UIView {
 extension ExplorerListView: ExplorerListViewViewModelDelegate {
     func didLoadInitialProduct() {
         collectionView.reloadData()
+        searchTextField.dropdownTableView.isHidden = true
     }
     
     func didLoadMoreProducts(with newIndexPaths: [IndexPath]) {
