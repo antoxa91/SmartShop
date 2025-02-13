@@ -7,7 +7,14 @@
 
 import UIKit
 
+protocol SearchHistoryTableViewDelegate: AnyObject {
+    func didSelectSearchHistoryItem(_ item: String)
+}
+
 final class SearchHistoryTableView: UITableView {
+    weak var searchHistoryTableViewDelegate: SearchHistoryTableViewDelegate?
+    
+    private let cellIdentifier = String(describing: SearchHistoryTableView.self)
     private var searchHistory: [String] = []
     
     override init(frame: CGRect, style: UITableView.Style) {
@@ -22,12 +29,15 @@ final class SearchHistoryTableView: UITableView {
     
     private func setup() {
         dataSource = self
-        register(UITableViewCell.self, forCellReuseIdentifier: "cell")
+        delegate = self
+        register(UITableViewCell.self, forCellReuseIdentifier: cellIdentifier)
         layer.cornerRadius = 8
         layer.masksToBounds = true
         translatesAutoresizingMaskIntoConstraints = false
         rowHeight = 30
         backgroundColor = AppColorEnum.tfBg.color
+        alpha = 0
+        bounces = false
     }
     
     func updateSearchHistory(_ history: [String]) {
@@ -44,9 +54,17 @@ extension SearchHistoryTableView: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
+        let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier, for: indexPath)
         cell.textLabel?.text = searchHistory[indexPath.row]
         cell.backgroundColor = AppColorEnum.tfBg.color
         return cell
+    }
+}
+
+// MARK: - UITableViewDelegate
+extension SearchHistoryTableView: UITableViewDelegate {
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let selectedItem = searchHistory[indexPath.row]
+        searchHistoryTableViewDelegate?.didSelectSearchHistoryItem(selectedItem)
     }
 }
