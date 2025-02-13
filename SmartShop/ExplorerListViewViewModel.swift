@@ -16,12 +16,15 @@ protocol ExplorerListViewViewModelDelegate: AnyObject {
 
 protocol ProductFetchable {
     func fetchProducts()
+    func filterByTitle(_ title: String?)
+    func filterByParameters(_ parameters: FilterParameters)
 }
 
 final class ExplorerListViewViewModel: NSObject {
-    private let networkService: ProductsLoader
     public weak var delegate: ExplorerListViewViewModelDelegate?
+    let networkService: ProductsLoader
     private var products: [Product] = []
+    private var searchHistory: [String] = []
     
     init(networkService: ProductsLoader) {
         self.networkService = networkService
@@ -30,6 +33,27 @@ final class ExplorerListViewViewModel: NSObject {
 
 // MARK: - ProductFetchable
 extension ExplorerListViewViewModel: ProductFetchable {
+    func filterByParameters(_ parameters: FilterParameters) {
+        networkService.filterByParameters(parameters) { [weak self] products in
+            DispatchQueue.main.async {
+                self?.products = products
+                self?.delegate?.didLoadInitialProduct()
+                print(products)
+            }
+        }
+    }
+    
+    func filterByTitle(_ title: String?) {
+        networkService.filterByTitle(title) { [weak self] products in
+            DispatchQueue.main.async {
+                self?.products = products
+                self?.delegate?.didLoadInitialProduct()
+                print(products)
+                
+            }
+        }
+    }
+    
     func fetchProducts() {
         networkService.fetchInitialProducts {
             DispatchQueue.main.async {
@@ -65,7 +89,7 @@ extension ExplorerListViewViewModel: UICollectionViewDelegateFlowLayout {
     }
 }
 
-
+// MARK: - UITextFieldDelegate
 extension ExplorerListViewViewModel: UITextFieldDelegate {
     func textFieldDidBeginEditing(_ textField: UITextField) {
         textField.placeholder = ""
@@ -78,12 +102,11 @@ extension ExplorerListViewViewModel: UITextFieldDelegate {
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
         guard let searchText = textField.text, !searchText.isEmpty else {
-            products = []
-            delegate?.didLoadInitialProduct()
+            fetchProducts()
             return false
         }
         
-        networkService.filterBy(title: searchText, parameters: nil) { [weak self] products in
+        networkService.filterByTitle(searchText) { [weak self] products in
             self?.products = products
             self?.delegate?.didLoadInitialProduct()
         }
