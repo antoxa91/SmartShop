@@ -60,7 +60,7 @@ final class ExplorerListView: UIView {
         tapGesture.cancelsTouchesInView = false
         addGestureRecognizer(tapGesture)
     }
-
+    
     @objc private func dismissKeyboardAndSearchHistory(_ gesture: UITapGestureRecognizer) {
         searchTextField.resignFirstResponder()
         searchTextField.dropdownTableView.isHidden = true

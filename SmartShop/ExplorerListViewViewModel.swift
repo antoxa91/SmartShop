@@ -94,9 +94,9 @@ extension ExplorerListViewViewModel: UITextFieldDelegate {
         textField.placeholder = ""
         
         let searchHistory = SearchHistoryManager.shared.getSearchHistory()
-          if let searchTextField = textField as? SearchTextField {
-              searchTextField.dropdownTableView.updateSearchHistory(searchHistory)
-          }
+        if let searchTextField = textField as? SearchTextField {
+            searchTextField.dropdownTableView.updateSearchHistory(searchHistory)
+        }
     }
     
     func textFieldDidEndEditing(_ textField: UITextField) {
