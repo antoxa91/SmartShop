@@ -6,3 +6,10 @@
 //
 
 import Foundation
+
+struct FilterParameters {
+    var price: String?
+    var priceMin: String?
+    var priceMax: String?
+    var categoryId: String?
+}
