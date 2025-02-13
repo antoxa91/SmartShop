@@ -39,7 +39,6 @@ extension ExplorerListViewViewModel: ProductFetchable {
             DispatchQueue.main.async {
                 self?.products = products
                 self?.delegate?.didLoadInitialProduct()
-                print(products)
             }
         }
     }
@@ -48,9 +47,7 @@ extension ExplorerListViewViewModel: ProductFetchable {
         networkService.filterByTitle(title) { [weak self] products in
             DispatchQueue.main.async {
                 self?.products = products
-                self?.delegate?.didLoadInitialProduct()
-                print(products)
-                
+                self?.delegate?.didLoadInitialProduct()                
             }
         }
     }
