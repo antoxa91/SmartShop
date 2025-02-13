@@ -7,15 +7,21 @@
 
 import UIKit
 
+protocol ExplorerListViewDelegate: AnyObject {
+    func presentBottomSheet(_ viewController: UIViewController)
+}
+
 final class ExplorerListView: UIView {
     private enum Constants {
         static let sectionInset: CGFloat = 10
         static let elementInset: CGFloat = 8
         static let elementHeight: CGFloat = 40
     }
+    weak var delegate: ExplorerListViewDelegate?
     
     private let viewModel: ExplorerListViewViewModel
     private let imageLoader: ImageLoaderProtocol
+    private var filterViewController: FilterViewController?
     
     // MARK: Private UI Properties
     private lazy var collectionView: UICollectionView = {
@@ -45,6 +51,7 @@ final class ExplorerListView: UIView {
         viewModel.delegate = self
         viewModel.fetchProducts()
         searchTextField.delegate = viewModel
+        searchTextField.bottomSheetDelegate = self
     }
     
     @available(*, unavailable)
@@ -98,10 +105,34 @@ extension ExplorerListView: ExplorerListViewViewModelDelegate {
     }
     
     func didLoadMoreProducts(with newIndexPaths: [IndexPath]) {
-        //
+        collectionView.insertItems(at: newIndexPaths)
     }
     
     func didSelectProduct(_ character: Product) {
         //
+    }
+}
+
+// MARK: - BottomSheetDelegate
+extension ExplorerListView: BottomSheetDelegate {
+    func showBottomSheet() {
+        filterViewController = FilterViewController(networkService: viewModel.networkService)
+        filterViewController?.delegate = self
+        
+        if let sheet = filterViewController?.sheetPresentationController {
+            sheet.detents = [.medium(), .large()]
+            sheet.preferredCornerRadius = 32
+            sheet.prefersGrabberVisible = true
+        }
+        
+        delegate?.presentBottomSheet(filterViewController!)
+    }
+}
+
+// MARK: - FilterDelegate
+extension ExplorerListView: FilterDelegate {
+    func applyFilters(parameters: FilterParameters) {
+        viewModel.filterByParameters(parameters)
+        collectionView.reloadData()
     }
 }
