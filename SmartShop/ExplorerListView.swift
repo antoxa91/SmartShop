@@ -56,9 +56,10 @@ final class ExplorerListView: UIView {
     private func setupTapGestureRecognizer() {
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboardAndSearchHistory))
         tapGesture.cancelsTouchesInView = false
+        tapGesture.delegate = self 
         addGestureRecognizer(tapGesture)
     }
-    
+
     @objc private func dismissKeyboardAndSearchHistory(_ gesture: UITapGestureRecognizer) {
         searchTextField.resignFirstResponder()
         dropdownTableView.alpha = 0
@@ -145,5 +146,13 @@ extension ExplorerListView: SearchHistoryTableViewDelegate {
         searchTextField.text = item
         dropdownTableView.alpha = 0
         viewModel.filterByTitle(item)
+    }
+}
+
+// MARK: - UIGestureRecognizerDelegate
+extension ExplorerListView: UIGestureRecognizerDelegate {
+    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
+        let location = touch.location(in: self)
+        return !dropdownTableView.frame.contains(location)
     }
 }
