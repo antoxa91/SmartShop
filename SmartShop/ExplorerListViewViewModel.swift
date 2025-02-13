@@ -22,6 +22,8 @@ protocol ProductFetchable {
 
 final class ExplorerListViewViewModel: NSObject {
     public weak var delegate: ExplorerListViewViewModelDelegate?
+    weak var dropdownTableView: SearchHistoryTableView?
+    
     let networkService: ProductsLoader
     private var products: [Product] = []
     
@@ -74,6 +76,7 @@ extension ExplorerListViewViewModel: UICollectionViewDataSource {
             Logger.cell.error("Failed to dequeue ExplorerListCollectionViewCell")
             return UICollectionViewCell()
         }
+        
         let product = products[indexPath.item]
         cell.configure(with: product)
         return cell
@@ -92,11 +95,8 @@ extension ExplorerListViewViewModel: UICollectionViewDelegateFlowLayout {
 extension ExplorerListViewViewModel: UITextFieldDelegate {
     func textFieldDidBeginEditing(_ textField: UITextField) {
         textField.placeholder = ""
-        
-        let searchHistory = SearchHistoryManager.shared.getSearchHistory()
-        if let searchTextField = textField as? SearchTextField {
-            searchTextField.dropdownTableView.updateSearchHistory(searchHistory)
-        }
+        dropdownTableView?.alpha = 0.9
+        dropdownTableView?.updateSearchHistory(SearchHistoryManager.shared.getSearchHistory())
     }
     
     func textFieldDidEndEditing(_ textField: UITextField) {
@@ -116,6 +116,7 @@ extension ExplorerListViewViewModel: UITextFieldDelegate {
         }
         
         SearchHistoryManager.shared.addSearchQuery(searchText)
+        dropdownTableView?.alpha = 0
         return true
     }
 }
