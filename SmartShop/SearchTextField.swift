@@ -13,7 +13,8 @@ protocol BottomSheetDelegate: AnyObject {
 
 final class SearchTextField: UITextField {
     weak var bottomSheetDelegate: BottomSheetDelegate?
-
+    lazy var dropdownTableView = SearchHistoryTableView()
+    
     // MARK: Private UI Properties
     private lazy var searchIconView: UIImageView = {
         let imageView = UIImageView()
@@ -67,6 +68,17 @@ final class SearchTextField: UITextField {
         rightView = filterButton
         rightViewMode = .always
         translatesAutoresizingMaskIntoConstraints = false
+        
+        addSubview(dropdownTableView)
+        
+        NSLayoutConstraint.activate([
+            dropdownTableView.topAnchor.constraint(equalTo: bottomAnchor),
+            dropdownTableView.leadingAnchor.constraint(equalTo: leadingAnchor),
+            dropdownTableView.trailingAnchor.constraint(equalTo: trailingAnchor),
+            dropdownTableView.heightAnchor.constraint(equalToConstant: 150)
+        ])
+        
+        dropdownTableView.isHidden = true
     }
     
     override func leftViewRect(forBounds bounds: CGRect) -> CGRect {
