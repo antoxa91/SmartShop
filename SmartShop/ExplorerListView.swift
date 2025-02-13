@@ -13,7 +13,6 @@ protocol ExplorerListViewDelegate: AnyObject {
 
 final class ExplorerListView: UIView {
     private enum Constants {
-        static let sectionInset: CGFloat = 10
         static let elementInset: CGFloat = 8
         static let elementHeight: CGFloat = 40
     }
@@ -22,20 +21,10 @@ final class ExplorerListView: UIView {
     private let viewModel: ExplorerListViewViewModel
     private let imageLoader: ImageLoaderProtocol
     private var filterViewController: FilterViewController?
+    private lazy var dropdownTableView = SearchHistoryTableView()
     
     // MARK: Private UI Properties
-    private lazy var collectionView: UICollectionView = {
-        let layout = UICollectionViewFlowLayout()
-        layout.scrollDirection = .vertical
-        layout.sectionInset = UIEdgeInsets(top: 0, left: Constants.sectionInset, bottom: Constants.sectionInset, right: Constants.sectionInset)
-        
-        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
-        collectionView.translatesAutoresizingMaskIntoConstraints = false
-        collectionView.backgroundColor = AppColorEnum.collectionView.color
-        collectionView.register(ExplorerListCollectionViewCell.self,
-                                forCellWithReuseIdentifier: ExplorerListCollectionViewCell.identifier)
-        return collectionView
-    }()
+    private lazy var explorerListCollectionView = ExplorerListCollectionView(viewModel)
     
     private lazy var searchTextField = SearchTextField()
     private lazy var basketView = BasketView()
@@ -46,13 +35,22 @@ final class ExplorerListView: UIView {
         self.imageLoader = imageLoader
         super.init(frame: .zero)
         setupSubviews()
-        setupCollectionView()
         setConstraints()
+        configureViewModel()
+        configureSearchTextField()
+        setupTapGestureRecognizer()
+    }
+    
+    private func configureViewModel() {
         viewModel.delegate = self
         viewModel.fetchProducts()
+        viewModel.dropdownTableView = dropdownTableView
+    }
+    
+    private func configureSearchTextField() {
         searchTextField.delegate = viewModel
         searchTextField.bottomSheetDelegate = self
-        setupTapGestureRecognizer()
+        dropdownTableView.searchHistoryTableViewDelegate = self
     }
     
     private func setupTapGestureRecognizer() {
@@ -63,7 +61,7 @@ final class ExplorerListView: UIView {
     
     @objc private func dismissKeyboardAndSearchHistory(_ gesture: UITapGestureRecognizer) {
         searchTextField.resignFirstResponder()
-        searchTextField.dropdownTableView.isHidden = true
+        dropdownTableView.alpha = 0
     }
     
     @available(*, unavailable)
@@ -72,22 +70,9 @@ final class ExplorerListView: UIView {
     }
     
     // MARK: Setup
-    private func setupCollectionView() {
-        collectionView.dataSource = viewModel
-        collectionView.delegate = viewModel
-    }
-    
     private func setupSubviews() {
-        addSubviews(collectionView, searchTextField, basketView)
+        addSubviews(explorerListCollectionView, searchTextField, basketView, dropdownTableView)
         translatesAutoresizingMaskIntoConstraints = false
-    }
-    
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        collectionView.layer.borderWidth = 8
-        collectionView.layer.borderColor = AppColorEnum.collectionView.color.cgColor
-        collectionView.layer.cornerRadius = 14
-        collectionView.layer.maskedCorners = [.layerMaxXMinYCorner, .layerMinXMinYCorner]
     }
     
     private func setConstraints() {
@@ -97,15 +82,20 @@ final class ExplorerListView: UIView {
             searchTextField.trailingAnchor.constraint(equalTo: basketView.leadingAnchor, constant: -Constants.elementInset),
             searchTextField.heightAnchor.constraint(equalToConstant: Constants.elementHeight),
             
+            dropdownTableView.topAnchor.constraint(equalTo: searchTextField.bottomAnchor, constant: Constants.elementInset),
+            dropdownTableView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: Constants.elementInset),
+            dropdownTableView.trailingAnchor.constraint(equalTo: basketView.leadingAnchor, constant: -Constants.elementInset),
+            dropdownTableView.heightAnchor.constraint(equalToConstant: 150),
+            
             basketView.topAnchor.constraint(equalTo: topAnchor),
             basketView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -Constants.elementInset),
             basketView.widthAnchor.constraint(equalToConstant: Constants.elementHeight),
             basketView.heightAnchor.constraint(equalToConstant: Constants.elementHeight),
             
-            collectionView.topAnchor.constraint(equalTo: searchTextField.bottomAnchor, constant: Constants.elementInset),
-            collectionView.leadingAnchor.constraint(equalTo: leadingAnchor),
-            collectionView.trailingAnchor.constraint(equalTo: trailingAnchor),
-            collectionView.bottomAnchor.constraint(equalTo: bottomAnchor)
+            explorerListCollectionView.topAnchor.constraint(equalTo: searchTextField.bottomAnchor, constant: Constants.elementInset),
+            explorerListCollectionView.leadingAnchor.constraint(equalTo: leadingAnchor),
+            explorerListCollectionView.trailingAnchor.constraint(equalTo: trailingAnchor),
+            explorerListCollectionView.bottomAnchor.constraint(equalTo: bottomAnchor),
         ])
     }
 }
@@ -113,12 +103,11 @@ final class ExplorerListView: UIView {
 // MARK: - ExplorerListViewViewModelDelegate
 extension ExplorerListView: ExplorerListViewViewModelDelegate {
     func didLoadInitialProduct() {
-        collectionView.reloadData()
-        searchTextField.dropdownTableView.isHidden = true
+        explorerListCollectionView.reloadData()
     }
     
     func didLoadMoreProducts(with newIndexPaths: [IndexPath]) {
-        collectionView.insertItems(at: newIndexPaths)
+        explorerListCollectionView.insertItems(at: newIndexPaths)
     }
     
     func didSelectProduct(_ character: Product) {
@@ -146,6 +135,15 @@ extension ExplorerListView: BottomSheetDelegate {
 extension ExplorerListView: FilterDelegate {
     func applyFilters(parameters: FilterParameters) {
         viewModel.filterByParameters(parameters)
-        collectionView.reloadData()
+        explorerListCollectionView.reloadData()
+    }
+}
+
+// MARK: - SearchHistoryTableViewDelegate
+extension ExplorerListView: SearchHistoryTableViewDelegate {
+    func didSelectSearchHistoryItem(_ item: String) {
+        searchTextField.text = item
+        dropdownTableView.alpha = 0
+        viewModel.filterByTitle(item)
     }
 }
