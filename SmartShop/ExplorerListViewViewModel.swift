@@ -43,9 +43,7 @@ extension ExplorerListViewViewModel: ProductFetchable {
     func filterByParameters(_ parameters: FilterParameters) {
         networkService.filterByParameters(parameters) { [weak self] products in
             DispatchQueue.main.async {
-                self?.products = products
-                self?.currentState = self?.products.isEmpty == true ? .nothingFound : .none
-                self?.delegate?.didLoadInitialProduct()
+                self?.updateProducts(with: products)
             }
         }
     }
@@ -53,11 +51,15 @@ extension ExplorerListViewViewModel: ProductFetchable {
     func filterByTitle(_ title: String?) {
         networkService.filterByTitle(title) { [weak self] products in
             DispatchQueue.main.async {
-                self?.products = products
-                self?.currentState = self?.products.isEmpty == true ? .nothingFound : .none
-                self?.delegate?.didLoadInitialProduct()
+                self?.updateProducts(with: products)
             }
         }
+    }
+    
+    private func updateProducts(with products: [Product]) {
+        self.products = products
+        self.currentState = self.products.isEmpty ? .nothingFound : .none
+        delegate?.didLoadInitialProduct()
     }
     
     func fetchProducts() {
@@ -101,10 +103,11 @@ extension ExplorerListViewViewModel: UICollectionViewDelegateFlowLayout {
 extension ExplorerListViewViewModel: UITextFieldDelegate {
     func textFieldDidBeginEditing(_ textField: UITextField) {
         textField.placeholder = ""
-        UIView.animate(withDuration: 0.3) {
+        UIView.animate(withDuration: 0.3, animations: {
             self.dropdownTableView?.alpha = 0.9
-        }
-        dropdownTableView?.updateSearchHistory(SearchHistoryManager.shared.getSearchHistory())
+        }, completion: { _ in
+            self.dropdownTableView?.updateSearchHistory(SearchHistoryManager.shared.getSearchHistory())
+        })
     }
     
     func textFieldDidEndEditing(_ textField: UITextField) {

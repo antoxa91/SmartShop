@@ -21,10 +21,10 @@ final class ExplorerListView: UIView {
     
     private let viewModel: ExplorerListViewViewModel
     private let imageLoader: ImageLoaderProtocol
-    private var filterViewController: FilterViewController?
-    private lazy var dropdownTableView = SearchHistoryTableView()
     
     // MARK: Private UI Properties
+    private var filterViewController: FilterViewController?
+    private lazy var dropdownTableView = SearchHistoryTableView()
     private lazy var explorerListCollectionView = ExplorerListCollectionView(viewModel)
     
     private lazy var searchTextField = SearchTextField()
@@ -42,6 +42,24 @@ final class ExplorerListView: UIView {
         setupTapGestureRecognizer()
     }
     
+    @available(*, unavailable)
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    // MARK: Setup
+    private func setupSubviews() {
+        addSubviews(explorerListCollectionView, searchTextField, basketView, dropdownTableView)
+        translatesAutoresizingMaskIntoConstraints = false
+    }
+    
+    private func setupTapGestureRecognizer() {
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboardAndSearchHistory))
+        tapGesture.cancelsTouchesInView = false
+        tapGesture.delegate = self
+        addGestureRecognizer(tapGesture)
+    }
+    
     private func configureViewModel() {
         viewModel.delegate = self
         viewModel.fetchProducts()
@@ -54,13 +72,6 @@ final class ExplorerListView: UIView {
         dropdownTableView.searchHistoryTableViewDelegate = self
     }
     
-    private func setupTapGestureRecognizer() {
-        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboardAndSearchHistory))
-        tapGesture.cancelsTouchesInView = false
-        tapGesture.delegate = self
-        addGestureRecognizer(tapGesture)
-    }
-    
     @objc private func dismissKeyboardAndSearchHistory(_ gesture: UITapGestureRecognizer) {
         searchTextField.resignFirstResponder()
         UIView.animate(withDuration: 0.3) {
@@ -68,17 +79,7 @@ final class ExplorerListView: UIView {
         }
     }
     
-    @available(*, unavailable)
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    // MARK: Setup
-    private func setupSubviews() {
-        addSubviews(explorerListCollectionView, searchTextField, basketView, dropdownTableView)
-        translatesAutoresizingMaskIntoConstraints = false
-    }
-    
+    // MARK: Layout
     private func setConstraints() {
         NSLayoutConstraint.activate([
             searchTextField.topAnchor.constraint(equalTo: topAnchor),
@@ -120,7 +121,7 @@ extension ExplorerListView: ExplorerListViewViewModelDelegate {
     func showEmptyState(with type: EmptyState) {
         let emptyStateVC = EmptyStateViewController()
         emptyStateVC.configure(with: type)
-        emptyStateVC.delegate = self // Устанавливаем делегат
+        emptyStateVC.delegate = self
         
         if let sheet = emptyStateVC.sheetPresentationController {
             sheet.detents = [.medium()]
