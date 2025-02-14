@@ -42,7 +42,7 @@ final class ExplorerViewController: UIViewController {
     private func setupView() {
         view.backgroundColor = AppColorEnum.appBackground.color
         view.addSubviews(explorerListView)
-        title = "Platzi Fake Store"
+        navigationItem.backButtonDisplayMode = .minimal
     }
     
     private func setConstraints() {
@@ -57,6 +57,11 @@ final class ExplorerViewController: UIViewController {
 
 // MARK: - ExplorerListViewDelegate
 extension ExplorerViewController: ExplorerListViewDelegate {
+    func pushDetailVC(_ productListView: ExplorerListView, didSelectProduct product: Product) {
+        let detailVC = ProductDetailViewController(product: product, imageLoader: imageLoader)
+        navigationController?.pushViewController(detailVC, animated: true)
+    }
+    
     func presentBottomSheet(_ viewController: UIViewController) {
         present(viewController, animated: true)
     }
