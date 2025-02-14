@@ -18,6 +18,15 @@ final class LoadingFooter: UICollectionReusableView {
         return indicator
     }()
     
+    var isAnimating: Bool = false {
+        didSet {
+            if isAnimating {
+                loadingIndicator.startAnimating()
+            } else {
+                loadingIndicator.stopAnimating()
+            }
+        }
+    }
     override init(frame: CGRect) {
         super.init(frame: frame)
         addSubview(loadingIndicator)
@@ -31,13 +40,5 @@ final class LoadingFooter: UICollectionReusableView {
     @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
-    }
-    
-    func startAnimating() {
-        loadingIndicator.startAnimating()
-    }
-    
-    func stopAnimating() {
-        loadingIndicator.stopAnimating()
     }
 }
