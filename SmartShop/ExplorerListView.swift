@@ -120,15 +120,17 @@ extension ExplorerListView: ExplorerListViewViewModelDelegate {
 extension ExplorerListView: BottomSheetDelegate {
     func showBottomSheet() {
         filterViewController = FilterViewController(networkService: viewModel.networkService)
-        filterViewController?.delegate = self
+
+        guard let filterViewController else { return }
+        filterViewController.delegate = self
         
-        if let sheet = filterViewController?.sheetPresentationController {
+        if let sheet = filterViewController.sheetPresentationController {
             sheet.detents = [.medium(), .large()]
             sheet.preferredCornerRadius = 32
             sheet.prefersGrabberVisible = true
         }
         
-        delegate?.presentBottomSheet(filterViewController!)
+        delegate?.presentBottomSheet(filterViewController)
     }
 }
 
