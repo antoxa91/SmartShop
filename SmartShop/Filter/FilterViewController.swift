@@ -12,6 +12,8 @@ protocol FilterDelegate: AnyObject {
 }
 
 final class FilterViewController: UIViewController {
+    weak var viewModel: ExplorerListViewViewModel?
+    
     // MARK: Properties
     private lazy var filterView = FilterView()
     private lazy var categoryManager = CategoryManager(containerView: filterView.categoryButtons)
@@ -56,6 +58,10 @@ final class FilterViewController: UIViewController {
             categoryId: categoryManager.categoryId
         )
         delegate?.applyFilters(parameters: parameters)
+        
+        let categoryId = categoryManager.categoryId ?? ""
+        viewModel?.updateSelectedCategories(categoryId)
+        
         dismiss(animated: true)
     }
     

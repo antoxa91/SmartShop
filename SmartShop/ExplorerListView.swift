@@ -151,6 +151,7 @@ extension ExplorerListView: ExplorerListViewViewModelDelegate {
 extension ExplorerListView: BottomSheetDelegate {
     func showBottomSheet() {
         filterViewController = FilterViewController(networkService: viewModel.networkService)
+        filterViewController?.viewModel = viewModel
         
         guard let filterViewController else { return }
         filterViewController.delegate = self

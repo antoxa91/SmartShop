@@ -34,8 +34,15 @@ final class ExplorerListViewViewModel: NSObject {
         }
     }
     
+    private var selectedCategorie = ""
+    
     init(networkService: ProductsLoader) {
         self.networkService = networkService
+    }
+    
+    func updateSelectedCategories(_ categorie: String) {
+        selectedCategorie = categorie
+        fetchProducts()
     }
 }
 
@@ -77,7 +84,6 @@ extension ExplorerListViewViewModel: ProductFetchable {
 // MARK: - UICollectionViewDataSource
 extension ExplorerListViewViewModel: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        print(products.count)
         return products.count
     }
     
@@ -98,7 +104,7 @@ extension ExplorerListViewViewModel: UICollectionViewDataSource {
             return UICollectionReusableView()
         }
         
-        footer.startAnimating()
+        footer.isAnimating = products.count > 8
         return footer
     }
     
@@ -110,8 +116,17 @@ extension ExplorerListViewViewModel: UICollectionViewDataSource {
 // MARK: - UICollectionViewDelegateFlowLayout
 extension ExplorerListViewViewModel: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        let width = (collectionView.bounds.width - 30) / 2
+        let width = calculateWidth(for: collectionView)
         return CGSize(width: width, height: width * 1.15)
+    }
+
+    private func calculateWidth(for collectionView: UICollectionView) -> CGFloat {
+        switch selectedCategorie {
+        case "1", "2":
+            return collectionView.bounds.width
+        default:
+            return (collectionView.bounds.width - 30) / 2
+        }
     }
 }
 
@@ -168,6 +183,7 @@ extension ExplorerListViewViewModel: UITextFieldDelegate {
             self?.products = products
             self?.currentState = self?.products.isEmpty == true ? .nothingFound : .none
             self?.delegate?.didLoadInitialProduct()
+            self?.selectedCategorie = ""
         }
         
         SearchHistoryManager.shared.addSearchQuery(searchText)
