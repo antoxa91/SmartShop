@@ -12,6 +12,7 @@ protocol ExplorerListViewViewModelDelegate: AnyObject {
     func didLoadInitialProduct()
     func didLoadMoreProducts(with newIndexPaths: [IndexPath])
     func didSelectProduct(_ character: Product)
+    func didUpdateState(_ state: EmptyState)
 }
 
 protocol ProductFetchable {
@@ -26,6 +27,11 @@ final class ExplorerListViewViewModel: NSObject {
     
     let networkService: ProductsLoader
     private var products: [Product] = []
+    private var currentState: EmptyState = .none {
+        didSet {
+            delegate?.didUpdateState(currentState)
+        }
+    }
     
     init(networkService: ProductsLoader) {
         self.networkService = networkService
@@ -38,6 +44,7 @@ extension ExplorerListViewViewModel: ProductFetchable {
         networkService.filterByParameters(parameters) { [weak self] products in
             DispatchQueue.main.async {
                 self?.products = products
+                self?.currentState = self?.products.isEmpty == true ? .nothingFound : .none
                 self?.delegate?.didLoadInitialProduct()
             }
         }
@@ -47,7 +54,8 @@ extension ExplorerListViewViewModel: ProductFetchable {
         networkService.filterByTitle(title) { [weak self] products in
             DispatchQueue.main.async {
                 self?.products = products
-                self?.delegate?.didLoadInitialProduct()                
+                self?.currentState = self?.products.isEmpty == true ? .nothingFound : .none
+                self?.delegate?.didLoadInitialProduct()
             }
         }
     }
@@ -56,6 +64,7 @@ extension ExplorerListViewViewModel: ProductFetchable {
         networkService.fetchInitialProducts {
             DispatchQueue.main.async {
                 self.products = self.networkService.products
+                self.currentState = self.products.isEmpty == true ? .downloadError : .none
                 self.delegate?.didLoadInitialProduct()
             }
         }
@@ -92,7 +101,9 @@ extension ExplorerListViewViewModel: UICollectionViewDelegateFlowLayout {
 extension ExplorerListViewViewModel: UITextFieldDelegate {
     func textFieldDidBeginEditing(_ textField: UITextField) {
         textField.placeholder = ""
-        dropdownTableView?.alpha = 0.9
+        UIView.animate(withDuration: 0.3) {
+            self.dropdownTableView?.alpha = 0.9
+        }
         dropdownTableView?.updateSearchHistory(SearchHistoryManager.shared.getSearchHistory())
     }
     
@@ -109,6 +120,7 @@ extension ExplorerListViewViewModel: UITextFieldDelegate {
         
         networkService.filterByTitle(searchText) { [weak self] products in
             self?.products = products
+            self?.currentState = self?.products.isEmpty == true ? .nothingFound : .none
             self?.delegate?.didLoadInitialProduct()
         }
         

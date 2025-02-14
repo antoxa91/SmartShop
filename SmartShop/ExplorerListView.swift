@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import OSLog
 
 protocol ExplorerListViewDelegate: AnyObject {
     func presentBottomSheet(_ viewController: UIViewController)
@@ -56,13 +57,15 @@ final class ExplorerListView: UIView {
     private func setupTapGestureRecognizer() {
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboardAndSearchHistory))
         tapGesture.cancelsTouchesInView = false
-        tapGesture.delegate = self 
+        tapGesture.delegate = self
         addGestureRecognizer(tapGesture)
     }
-
+    
     @objc private func dismissKeyboardAndSearchHistory(_ gesture: UITapGestureRecognizer) {
         searchTextField.resignFirstResponder()
-        dropdownTableView.alpha = 0
+        UIView.animate(withDuration: 0.3) {
+            self.dropdownTableView.alpha = 0
+        }
     }
     
     @available(*, unavailable)
@@ -103,6 +106,30 @@ final class ExplorerListView: UIView {
 
 // MARK: - ExplorerListViewViewModelDelegate
 extension ExplorerListView: ExplorerListViewViewModelDelegate {
+    func didUpdateState(_ state: EmptyState) {
+        switch state {
+        case .nothingFound:
+            showEmptyState(with: .nothingFound)
+        case .downloadError:
+            showEmptyState(with: .downloadError)
+        case .none:
+            Logger.emptyState.info("Data loaded successfully, no empty state to display.")
+        }
+    }
+    
+    func showEmptyState(with type: EmptyState) {
+        let emptyStateVC = EmptyStateViewController()
+        emptyStateVC.configure(with: type)
+        emptyStateVC.delegate = self // Устанавливаем делегат
+        
+        if let sheet = emptyStateVC.sheetPresentationController {
+            sheet.detents = [.medium()]
+            sheet.preferredCornerRadius = 32
+        }
+        
+        delegate?.presentBottomSheet(emptyStateVC)
+    }
+    
     func didLoadInitialProduct() {
         explorerListCollectionView.reloadData()
     }
@@ -120,7 +147,7 @@ extension ExplorerListView: ExplorerListViewViewModelDelegate {
 extension ExplorerListView: BottomSheetDelegate {
     func showBottomSheet() {
         filterViewController = FilterViewController(networkService: viewModel.networkService)
-
+        
         guard let filterViewController else { return }
         filterViewController.delegate = self
         
@@ -146,7 +173,9 @@ extension ExplorerListView: FilterDelegate {
 extension ExplorerListView: SearchHistoryTableViewDelegate {
     func didSelectSearchHistoryItem(_ item: String) {
         searchTextField.text = item
-        dropdownTableView.alpha = 0
+        UIView.animate(withDuration: 0.3) {
+            self.dropdownTableView.alpha = 0
+        }
         viewModel.filterByTitle(item)
     }
 }
@@ -156,5 +185,13 @@ extension ExplorerListView: UIGestureRecognizerDelegate {
     func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
         let location = touch.location(in: self)
         return !dropdownTableView.frame.contains(location)
+    }
+}
+
+
+// MARK: - EmptyStateViewDelegate
+extension ExplorerListView: EmptyStateViewDelegate {
+    func retryButtonTapped() {
+        viewModel.fetchProducts()
     }
 }
