@@ -42,7 +42,7 @@ final class FilterView: UIView {
         let button = UIButton(type: .system)
         button.setTitle("Apply Filters", for: .normal)
         button.titleLabel?.font = .boldSystemFont(ofSize: Constants.buttonFontSize)
-        button.setTitleColor(AppColorEnum.tint.color, for: .normal)
+        button.setTitleColor(AppColorEnum.lightWhite.color, for: .normal)
         button.backgroundColor = AppColorEnum.top.color
         button.layer.borderColor = AppColorEnum.tfBg.color.cgColor
         button.layer.borderWidth = Constants.buttonBorderWidth
