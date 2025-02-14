@@ -11,7 +11,7 @@ import OSLog
 protocol ExplorerListViewViewModelDelegate: AnyObject {
     func didLoadInitialProduct()
     func didLoadMoreProducts(with newIndexPaths: [IndexPath])
-    func didSelectProduct(_ character: Product)
+    func didSelectProduct(_ product: Product)
     func didUpdateState(_ state: EmptyState)
 }
 
@@ -110,6 +110,12 @@ extension ExplorerListViewViewModel: UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForFooterInSection section: Int) -> CGSize {
         return CGSize(width: collectionView.bounds.width, height: 50)
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        collectionView.deselectItem(at: indexPath, animated: true)
+        let product = products[indexPath.row]
+        delegate?.didSelectProduct(product)
     }
 }
 
