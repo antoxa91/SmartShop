@@ -56,6 +56,7 @@ extension SearchHistoryTableView: UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier, for: indexPath)
         cell.textLabel?.text = searchHistory[indexPath.row]
+        cell.textLabel?.textColor = AppColorEnum.lightWhite.color
         cell.backgroundColor = AppColorEnum.tfBg.color
         return cell
     }

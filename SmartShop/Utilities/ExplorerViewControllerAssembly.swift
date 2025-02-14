@@ -23,9 +23,9 @@ struct ExplorerViewControllerAssembly {
         let appearance = UINavigationBarAppearance()
         appearance.configureWithOpaqueBackground()
         appearance.backgroundColor = AppColorEnum.appBackground.color
+        appearance.titleTextAttributes = [.foregroundColor: AppColorEnum.tfBg.color]
         
         UINavigationBar.appearance().standardAppearance = appearance
-        UINavigationBar.appearance().scrollEdgeAppearance = appearance
-        UINavigationBar.appearance().compactAppearance = appearance
+        UINavigationBar.appearance().tintColor = AppColorEnum.tfBg.color
     }
 }
