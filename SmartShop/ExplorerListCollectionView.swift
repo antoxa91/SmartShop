@@ -10,16 +10,15 @@ import UIKit
 final class ExplorerListCollectionView: UICollectionView {
     private let sectionInset: CGFloat = 10
     private let viewModel: ExplorerListViewViewModel
-
+    
     init(_ viewModel: ExplorerListViewViewModel) {
         self.viewModel = viewModel
-
+        
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .vertical
         layout.sectionInset = UIEdgeInsets(top: 0, left: sectionInset, bottom: sectionInset, right: sectionInset)
-        
         super.init(frame: .zero, collectionViewLayout: layout)
-
+        
         setup()
     }
     
@@ -32,7 +31,10 @@ final class ExplorerListCollectionView: UICollectionView {
         translatesAutoresizingMaskIntoConstraints = false
         backgroundColor = AppColorEnum.collectionView.color
         register(ExplorerListCollectionViewCell.self,
-                                forCellWithReuseIdentifier: ExplorerListCollectionViewCell.identifier)
+                 forCellWithReuseIdentifier: ExplorerListCollectionViewCell.identifier)
+        register(LoadingFooter.self,
+                 forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter,
+                 withReuseIdentifier: LoadingFooter.identifier)
         dataSource = viewModel
         delegate = viewModel
     }

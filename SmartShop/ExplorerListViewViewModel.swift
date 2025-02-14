@@ -22,11 +22,12 @@ protocol ProductFetchable {
 }
 
 final class ExplorerListViewViewModel: NSObject {
-    public weak var delegate: ExplorerListViewViewModelDelegate?
+    weak var delegate: ExplorerListViewViewModelDelegate?
     weak var dropdownTableView: SearchHistoryTableView?
     
     let networkService: ProductsLoader
     private var products: [Product] = []
+    
     private var currentState: EmptyState = .none {
         didSet {
             delegate?.didUpdateState(currentState)
@@ -76,6 +77,7 @@ extension ExplorerListViewViewModel: ProductFetchable {
 // MARK: - UICollectionViewDataSource
 extension ExplorerListViewViewModel: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        print(products.count)
         return products.count
     }
     
@@ -89,6 +91,20 @@ extension ExplorerListViewViewModel: UICollectionViewDataSource {
         cell.configure(with: product)
         return cell
     }
+    
+    func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
+        guard kind == UICollectionView.elementKindSectionFooter, let footer = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: LoadingFooter.identifier, for: indexPath) as? LoadingFooter else {
+            Logger.cell.warning("Cant create LoadingFooter")
+            return UICollectionReusableView()
+        }
+        
+        footer.startAnimating()
+        return footer
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForFooterInSection section: Int) -> CGSize {
+        return CGSize(width: collectionView.bounds.width, height: 50)
+    }
 }
 
 // MARK: - UICollectionViewDelegateFlowLayout
@@ -98,6 +114,33 @@ extension ExplorerListViewViewModel: UICollectionViewDelegateFlowLayout {
         return CGSize(width: width, height: width * 1.15)
     }
 }
+
+// MARK: UIScrollViewDelegate
+extension ExplorerListViewViewModel: UIScrollViewDelegate {
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        Timer.scheduledTimer(withTimeInterval: 0.3, repeats: false) { [weak self] timer in
+            let offset = scrollView.contentOffset.y
+            let totalContentHeight = scrollView.contentSize.height
+            let totalScrollViewFixedHeight = scrollView.frame.size.height
+            
+            if offset >= (totalContentHeight - totalScrollViewFixedHeight - 120) {
+                self?.downloadAdditionalProducts()
+            }
+            timer.invalidate()
+        }
+    }
+    
+    private func downloadAdditionalProducts() {
+        networkService.fetchAdditionalProducts { [weak self] indexPathsToAdd in
+            guard let self else { return }
+            DispatchQueue.main.async {
+                self.products = self.networkService.products
+                self.delegate?.didLoadMoreProducts(with: indexPathsToAdd)
+            }
+        }
+    }
+}
+
 
 // MARK: - UITextFieldDelegate
 extension ExplorerListViewViewModel: UITextFieldDelegate {
