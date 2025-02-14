@@ -7,8 +7,14 @@
 
 import UIKit
 
+protocol BottomSheetDelegate: AnyObject {
+    func showBottomSheet()
+}
+
 final class SearchTextField: UITextField {
+    weak var bottomSheetDelegate: BottomSheetDelegate?
     
+    // MARK: Private UI Properties
     private lazy var searchIconView: UIImageView = {
         let imageView = UIImageView()
         imageView.tintColor = AppColorEnum.tint.color
@@ -27,6 +33,7 @@ final class SearchTextField: UITextField {
         return button
     }()
     
+    // MARK: Init
     override init(frame: CGRect) {
         super.init(frame: frame)
         setup()
@@ -37,6 +44,7 @@ final class SearchTextField: UITextField {
         fatalError("init(coder:) has not been implemented")
     }
     
+    // MARK: Setup
     private func setup() {
         let placeholderAttributes = NSAttributedString(
             string: "Search item or brands...",
@@ -52,7 +60,6 @@ final class SearchTextField: UITextField {
         backgroundColor = AppColorEnum.tfBg.color
         layer.cornerRadius = 15
         returnKeyType = .search
-        delegate = self
         
         leftView = searchIconView
         leftViewMode = .always
@@ -75,6 +82,7 @@ final class SearchTextField: UITextField {
         return rect
     }
     
+    // MARK: Action
     @objc private func filterButtonTapped() {
         UIView.animate(withDuration: 0.15, animations: {
             self.filterButton.transform = CGAffineTransform(rotationAngle: .pi)
@@ -83,39 +91,7 @@ final class SearchTextField: UITextField {
                 self.filterButton.transform = .identity
             }
         }
-    }
-}
-
-// MARK: - UITextFieldDelegate
-extension SearchTextField: UITextFieldDelegate {
-    func textFieldDidBeginEditing(_ textField: UITextField) {
-        UIView.animate(withDuration: 0.3) {
-            self.searchIconView.transform = CGAffineTransform(scaleX: 1.2, y: 1.2)
-            self.searchIconView.alpha = 0.7
-        }
         
-        textField.placeholder = ""
-        rightView?.isHidden = true
-    }
-    
-    func textFieldDidEndEditing(_ textField: UITextField) {
-        UIView.animate(withDuration: 0.3) {
-            self.searchIconView.transform = .identity
-            self.searchIconView.alpha = 1.0
-        }
-        
-        textField.placeholder = "Search item or brands..."
-        rightView?.isHidden = false
-    }
-    
-    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        textField.resignFirstResponder()
-        
-        guard let searchText = textField.text, !searchText.isEmpty else {
-            
-            return false
-        }
-        
-        return true
+        bottomSheetDelegate?.showBottomSheet()
     }
 }

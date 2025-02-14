@@ -25,6 +25,7 @@ final class BasketView: UIView {
         return button
     }()
     
+    // MARK: Init
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupView()
@@ -35,6 +36,7 @@ final class BasketView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
+    // MARK: Setup
     private func setupView() {
         backgroundColor = AppColorEnum.tfBg.color
         layer.cornerRadius = Constants.cornerRadius
@@ -54,6 +56,7 @@ final class BasketView: UIView {
         ])
     }
     
+    // MARK: Action
     @objc private func basketButtonTapped() {
         UIView.animate(withDuration: Constants.buttonTap, animations: {
             self.basketButton.transform = CGAffineTransform(scaleX: Constants.buttonScale,

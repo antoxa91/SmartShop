@@ -20,13 +20,13 @@ enum AppColorEnum {
         case .appBackground:
             return UIColor(hex: "#025F46")
         case .cellBackground:
-            return UIColor(hex: "#BBE199")
+            return UIColor(hex: "#E3F8CC")
         case .tint:
             return UIColor(hex: "#D4F3EA")
         case .top:
             return UIColor(hex: "#015F46")
         case .collectionView:
-            return UIColor(hex: "#E3F8CC")
+            return UIColor(hex: "#BBE199")
         case .tfBg:
             return UIColor(hex: "#024F43")
         }

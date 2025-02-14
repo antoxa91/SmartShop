@@ -8,13 +8,18 @@
 import UIKit
 
 final class ExplorerViewController: UIViewController {
-    private lazy var explorerListView: ExplorerListView = {
-        let explorerListView = ExplorerListView(networkService: self.networkService, imageLoader: self.imageLoader)
-        return explorerListView
-    }()
+    // MARK: Private Properties
     private let networkService: ProductsLoader
     private let imageLoader: ImageLoaderProtocol
     
+    private lazy var explorerListView: ExplorerListView = {
+        let explorerListView = ExplorerListView(networkService: self.networkService,
+                                                imageLoader: self.imageLoader)
+        explorerListView.delegate = self
+        return explorerListView
+    }()
+    
+    // MARK: Init
     init(networkService: ProductsLoader, imageLoader: ImageLoaderProtocol) {
         self.networkService = networkService
         self.imageLoader = imageLoader
@@ -50,3 +55,9 @@ final class ExplorerViewController: UIViewController {
     }
 }
 
+// MARK: - ExplorerListViewDelegate
+extension ExplorerViewController: ExplorerListViewDelegate {
+    func presentBottomSheet(_ viewController: UIViewController) {
+        present(viewController, animated: true)
+    }
+}
