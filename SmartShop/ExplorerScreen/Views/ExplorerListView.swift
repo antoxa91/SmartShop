@@ -10,6 +10,8 @@ import OSLog
 
 protocol ExplorerListViewDelegate: AnyObject {
     func presentBottomSheet(_ viewController: UIViewController)
+    func pushDetailVC(_ productListView: ExplorerListView,
+                      didSelectProduct product: Product)
 }
 
 final class ExplorerListView: UIView {
@@ -142,8 +144,8 @@ extension ExplorerListView: ExplorerListViewViewModelDelegate {
         }
     }
     
-    func didSelectProduct(_ character: Product) {
-        //
+    func didSelectProduct(_ product: Product) {
+        delegate?.pushDetailVC(self, didSelectProduct: product)
     }
 }
 
