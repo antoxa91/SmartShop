@@ -17,6 +17,7 @@ final class ExplorerListView: UIView {
         static let elementInset: CGFloat = 8
         static let elementHeight: CGFloat = 40
     }
+    
     weak var delegate: ExplorerListViewDelegate?
     
     private let viewModel: ExplorerListViewViewModel
@@ -136,7 +137,9 @@ extension ExplorerListView: ExplorerListViewViewModelDelegate {
     }
     
     func didLoadMoreProducts(with newIndexPaths: [IndexPath]) {
-        explorerListCollectionView.insertItems(at: newIndexPaths)
+        explorerListCollectionView.performBatchUpdates {
+            self.explorerListCollectionView.insertItems(at: newIndexPaths)
+        }
     }
     
     func didSelectProduct(_ character: Product) {
@@ -148,6 +151,7 @@ extension ExplorerListView: ExplorerListViewViewModelDelegate {
 extension ExplorerListView: BottomSheetDelegate {
     func showBottomSheet() {
         filterViewController = FilterViewController(networkService: viewModel.networkService)
+        filterViewController?.viewModel = viewModel
         
         guard let filterViewController else { return }
         filterViewController.delegate = self

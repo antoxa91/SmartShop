@@ -22,19 +22,27 @@ protocol ProductFetchable {
 }
 
 final class ExplorerListViewViewModel: NSObject {
-    public weak var delegate: ExplorerListViewViewModelDelegate?
+    weak var delegate: ExplorerListViewViewModelDelegate?
     weak var dropdownTableView: SearchHistoryTableView?
     
     let networkService: ProductsLoader
     private var products: [Product] = []
+    
     private var currentState: EmptyState = .none {
         didSet {
             delegate?.didUpdateState(currentState)
         }
     }
     
+    private var selectedCategorie = ""
+    
     init(networkService: ProductsLoader) {
         self.networkService = networkService
+    }
+    
+    func updateSelectedCategories(_ categorie: String) {
+        selectedCategorie = categorie
+        fetchProducts()
     }
 }
 
@@ -89,15 +97,65 @@ extension ExplorerListViewViewModel: UICollectionViewDataSource {
         cell.configure(with: product)
         return cell
     }
+    
+    func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
+        guard kind == UICollectionView.elementKindSectionFooter, let footer = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: LoadingFooter.identifier, for: indexPath) as? LoadingFooter else {
+            Logger.cell.warning("Cant create LoadingFooter")
+            return UICollectionReusableView()
+        }
+        
+        footer.isAnimating = products.count > 8
+        return footer
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForFooterInSection section: Int) -> CGSize {
+        return CGSize(width: collectionView.bounds.width, height: 50)
+    }
 }
 
 // MARK: - UICollectionViewDelegateFlowLayout
 extension ExplorerListViewViewModel: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        let width = (collectionView.bounds.width - 30) / 2
+        let width = calculateWidth(for: collectionView)
         return CGSize(width: width, height: width * 1.15)
     }
+
+    private func calculateWidth(for collectionView: UICollectionView) -> CGFloat {
+        switch selectedCategorie {
+        case "1", "2":
+            return collectionView.bounds.width
+        default:
+            return (collectionView.bounds.width - 30) / 2
+        }
+    }
 }
+
+// MARK: UIScrollViewDelegate
+extension ExplorerListViewViewModel: UIScrollViewDelegate {
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        Timer.scheduledTimer(withTimeInterval: 0.3, repeats: false) { [weak self] timer in
+            let offset = scrollView.contentOffset.y
+            let totalContentHeight = scrollView.contentSize.height
+            let totalScrollViewFixedHeight = scrollView.frame.size.height
+            
+            if offset >= (totalContentHeight - totalScrollViewFixedHeight - 120) {
+                self?.downloadAdditionalProducts()
+            }
+            timer.invalidate()
+        }
+    }
+    
+    private func downloadAdditionalProducts() {
+        networkService.fetchAdditionalProducts { [weak self] indexPathsToAdd in
+            guard let self else { return }
+            DispatchQueue.main.async {
+                self.products = self.networkService.products
+                self.delegate?.didLoadMoreProducts(with: indexPathsToAdd)
+            }
+        }
+    }
+}
+
 
 // MARK: - UITextFieldDelegate
 extension ExplorerListViewViewModel: UITextFieldDelegate {
@@ -125,6 +183,7 @@ extension ExplorerListViewViewModel: UITextFieldDelegate {
             self?.products = products
             self?.currentState = self?.products.isEmpty == true ? .nothingFound : .none
             self?.delegate?.didLoadInitialProduct()
+            self?.selectedCategorie = ""
         }
         
         SearchHistoryManager.shared.addSearchQuery(searchText)

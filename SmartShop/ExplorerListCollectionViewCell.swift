@@ -30,14 +30,6 @@ final class ExplorerListCollectionViewCell: UICollectionViewCell {
         return imageView
     }()
     
-    private lazy var activityIndicator: UIActivityIndicatorView = {
-        let indicator = UIActivityIndicatorView(style: .medium)
-        indicator.color = AppColorEnum.appBackground.color
-        indicator.translatesAutoresizingMaskIntoConstraints = false
-        indicator.hidesWhenStopped = true
-        return indicator
-    }()
-    
     // MARK: Init
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -56,7 +48,7 @@ final class ExplorerListCollectionViewCell: UICollectionViewCell {
         contentView.backgroundColor = AppColorEnum.cellBackground.color
         contentView.layer.cornerRadius = cornerRadius
         productImageView.layer.cornerRadius = cornerRadius
-        contentView.addSubviews(productImageView, activityIndicator)
+        contentView.addSubview(productImageView)
     }
     
     override func prepareForReuse() {
@@ -71,9 +63,6 @@ final class ExplorerListCollectionViewCell: UICollectionViewCell {
             productImageView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
             productImageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
             productImageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
-            
-            activityIndicator.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
-            activityIndicator.centerYAnchor.constraint(equalTo: contentView.centerYAnchor)
         ])
     }
 }
@@ -90,11 +79,8 @@ extension ExplorerListCollectionViewCell: ConfigurableViewProtocol {
             return
         }
         
-        activityIndicator.startAnimating()
-        
         imageLoader?.fetchImage(with: url) { [weak self] image in
             DispatchQueue.main.async {
-                self?.activityIndicator.stopAnimating()
                 guard let image else {
                     self?.setPlaceholderImage()
                     return
