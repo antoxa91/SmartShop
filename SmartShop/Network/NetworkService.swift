@@ -10,6 +10,7 @@ import OSLog
 
 protocol ProductsLoader: AnyObject {
     func fetchInitialProducts(completion: @escaping () -> Void)
+    func fetchAdditionalProducts(completion: @escaping ([IndexPath]) -> Void)
     func filterByTitle(_ title: String?, completion: @escaping ([Product]) -> Void)
     func filterByParameters(_ parameters: FilterParameters?, completion: @escaping ([Product]) -> Void)
     var products: [Product] { get }
@@ -28,13 +29,19 @@ final class NetworkService {
         static let priceMin = "price_min"
         static let priceMax = "price_max"
         static let categoryId = "categoryId"
+        
+        static let offset = "offset"
+        static let limit = "limit"
     }
     
     private let decoder = JSONDecoder()
     private let session: URLSession
     
     var products: [Product] = []
-    
+    private var offset = 0
+    private let limit = 8
+    private var isLoadingMoreProducts = false
+
     init(session: URLSession = URLSession(configuration: .default)) {
         self.session = session
     }
@@ -89,12 +96,18 @@ final class NetworkService {
 // MARK: - ProductsLoader
 extension NetworkService: ProductsLoader {
     func fetchInitialProducts(completion: @escaping () -> Void) {
-        guard let url = buildURL(queryItems: nil) else { return }
+        offset = 0
 
+        guard let url = buildURL(queryItems: [
+            URLQueryItem(name: ConstantsQueryItem.offset, value: "\(offset)"),
+            URLQueryItem(name: ConstantsQueryItem.limit, value: "\(limit)")
+        ]) else { return }
+        
         fetchData(awaiting: [Product].self, url: url) {[weak self] result in
             switch result {
             case .success(let response):
                 self?.products = response
+
                 DispatchQueue.main.async {
                     completion()
                 }
@@ -105,6 +118,46 @@ extension NetworkService: ProductsLoader {
         }
     }
     
+    func fetchAdditionalProducts(completion: @escaping ([IndexPath]) -> Void) {
+        guard !isLoadingMoreProducts else { return }
+        isLoadingMoreProducts = true
+        
+        guard let url = buildURL(queryItems: [
+            URLQueryItem(name: ConstantsQueryItem.offset, value: "\(offset)"),
+            URLQueryItem(name: ConstantsQueryItem.limit, value: "\(limit)")
+        ]) else { return }
+        print(url.absoluteString)
+        
+        fetchData(awaiting: [Product].self, url: url) {[weak self] result in
+            guard let self else { return }
+            
+            switch result {
+            case .success(let response):
+                let moreResults = response
+                
+                let newCount = moreResults.count
+                let totalCount = self.products.count + newCount
+                let startingIndex = totalCount - newCount
+                let indexPathsToAdd = (startingIndex..<startingIndex + moreResults.count).map {
+                    IndexPath(row: $0, section: 0)
+                }
+                
+                self.products.append(contentsOf: moreResults)
+                self.offset += self.limit
+
+                self.isLoadingMoreProducts = false
+                DispatchQueue.main.async {
+                    completion(indexPathsToAdd)
+                }
+            case .failure(let error):
+                self.isLoadingMoreProducts = false
+                Logger.network.error("Cant`t download more products: \(error.localizedDescription)")
+                completion([])
+            }
+        }
+    }
+    
+    // MARK: Filters
     func filterByTitle(_ title: String?, completion: @escaping ([Product]) -> Void) {
         let queryItems = [
             URLQueryItem(name: ConstantsQueryItem.title, value: title)
