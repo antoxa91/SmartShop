@@ -87,7 +87,7 @@ final class ProductImagePageViewController: UIPageViewController {
     
     private func loadImage(for imageView: UIImageView, at index: Int) {
         guard index >= 0 && index < images.count,
-              let url = URL(string: images[index]) else {
+              let url = URL(string: images[index].cleanedURLString()) else {
             Logger.productImagePageVC.error("Error: Invalid URL for Image: \(self.images[index])")
             pageControl.isHidden = true
             imageView.image = .imageNotFound
