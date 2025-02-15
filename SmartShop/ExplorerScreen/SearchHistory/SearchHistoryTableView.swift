@@ -38,6 +38,9 @@ final class SearchHistoryTableView: UITableView {
         backgroundColor = AppColorEnum.tfBg.color
         alpha = 0
         bounces = false
+        separatorStyle = .singleLine
+        separatorColor = .lightGray
+        separatorInset = .zero
     }
     
     func updateSearchHistory(_ history: [String]) {
@@ -58,6 +61,10 @@ extension SearchHistoryTableView: UITableViewDataSource {
         cell.textLabel?.text = searchHistory[indexPath.row]
         cell.textLabel?.textColor = AppColorEnum.lightWhite.color
         cell.backgroundColor = AppColorEnum.tfBg.color
+        let selectedBackgroundView = UIView()
+        selectedBackgroundView.backgroundColor = AppColorEnum.appBackground.color
+        cell.selectedBackgroundView = selectedBackgroundView
+        
         return cell
     }
 }

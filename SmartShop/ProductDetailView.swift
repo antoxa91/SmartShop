@@ -18,7 +18,7 @@ final class ProductDetailView: UIView {
     private enum Constants {
         static let defaultPadding: CGFloat = 8
         static let buttonHeight: CGFloat = 45
-        static let imageHeightMultiplier: CGFloat = 0.6
+        static let imageHeightMultiplier: CGFloat = 0.56
         static let buttonWidthMultiplier: CGFloat = 0.56
         static let quantityViewWidthMultiplier: CGFloat = 0.35
     }

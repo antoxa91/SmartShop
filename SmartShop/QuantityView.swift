@@ -38,7 +38,10 @@ final class QuantityView: UIView {
     
     private var counter = 1 {
         didSet {
-            counterLabel.text = "\(counter)"
+            UIView.transition(with: self.counterLabel, duration: 0.3, options: .transitionFlipFromBottom, animations: { [weak self] in
+                guard let self else { return }
+                counterLabel.text = "\(self.counter)"
+            })
         }
     }
     
