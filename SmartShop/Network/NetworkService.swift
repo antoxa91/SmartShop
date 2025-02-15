@@ -12,8 +12,9 @@ protocol ProductsLoader: AnyObject {
     func fetchInitialProducts(completion: @escaping () -> Void)
     func fetchAdditionalProducts(completion: @escaping ([IndexPath]) -> Void)
     func fetchCategories(completion: @escaping () -> Void)
+    
     func filterByTitle(_ title: String?, completion: @escaping ([Product]) -> Void)
-    func filterByParameters2(_ parameters: FilterParameters?, completion: @escaping ([Product]) -> Void)
+    func filterByParameters(_ parameters: FilterParameters?, completion: @escaping ([Product]) -> Void)
     var products: [Product] { get }
     var categories: [Product.Category] { get }
 }
@@ -187,11 +188,12 @@ extension NetworkService: ProductsLoader {
         filterProducts(with: queryItems, completion: completion)
     }
     
-    func filterByParameters2(_ parameters: FilterParameters?, completion: @escaping ([Product]) -> Void) {
+    func filterByParameters(_ parameters: FilterParameters?, completion: @escaping ([Product]) -> Void) {
         let queryItems = [
             URLQueryItem(name: ConstantsQueryItem.price, value: parameters?.price),
             URLQueryItem(name: ConstantsQueryItem.priceMin, value: parameters?.priceMin),
             URLQueryItem(name: ConstantsQueryItem.priceMax, value: parameters?.priceMax),
+            URLQueryItem(name: ConstantsQueryItem.categoryId, value: parameters?.categoryId),
         ]
         
         filterProducts(with: queryItems, completion: completion)
