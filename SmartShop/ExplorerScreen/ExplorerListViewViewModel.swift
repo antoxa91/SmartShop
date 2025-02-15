@@ -125,7 +125,7 @@ extension ExplorerListViewViewModel: UICollectionViewDelegateFlowLayout {
         let width = calculateWidth(for: collectionView)
         return CGSize(width: width, height: width * 1.15)
     }
-
+    
     private func calculateWidth(for collectionView: UICollectionView) -> CGFloat {
         switch selectedCategorie {
         case "1", "2":
@@ -139,15 +139,12 @@ extension ExplorerListViewViewModel: UICollectionViewDelegateFlowLayout {
 // MARK: UIScrollViewDelegate
 extension ExplorerListViewViewModel: UIScrollViewDelegate {
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        Timer.scheduledTimer(withTimeInterval: 0.3, repeats: false) { [weak self] timer in
-            let offset = scrollView.contentOffset.y
-            let totalContentHeight = scrollView.contentSize.height
-            let totalScrollViewFixedHeight = scrollView.frame.size.height
-            
-            if offset >= (totalContentHeight - totalScrollViewFixedHeight - 120) {
-                self?.downloadAdditionalProducts()
-            }
-            timer.invalidate()
+        let offset = scrollView.contentOffset.y
+        let totalContentHeight = scrollView.contentSize.height
+        let totalScrollViewFixedHeight = scrollView.frame.size.height
+        
+        if offset >= (totalContentHeight - totalScrollViewFixedHeight - 120) {
+            self.downloadAdditionalProducts()
         }
     }
     
