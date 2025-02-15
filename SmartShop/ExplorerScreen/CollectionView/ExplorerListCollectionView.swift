@@ -29,7 +29,7 @@ final class ExplorerListCollectionView: UICollectionView {
     
     private func setup() {
         translatesAutoresizingMaskIntoConstraints = false
-        backgroundColor = AppColorEnum.collectionView.color
+        backgroundColor = AppColorEnum.lightWhite.color
         register(ExplorerListCollectionViewCell.self,
                  forCellWithReuseIdentifier: ExplorerListCollectionViewCell.identifier)
         register(LoadingFooter.self,
@@ -42,7 +42,7 @@ final class ExplorerListCollectionView: UICollectionView {
     override func layoutSubviews() {
         super.layoutSubviews()
         layer.borderWidth = 8
-        layer.borderColor = AppColorEnum.collectionView.color.cgColor
+        layer.borderColor = AppColorEnum.lightWhite.color.cgColor
         layer.cornerRadius = 14
         layer.maskedCorners = [.layerMaxXMinYCorner, .layerMinXMinYCorner]
     }

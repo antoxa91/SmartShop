@@ -19,7 +19,7 @@ final class BasketView: UIView {
     private lazy var basketButton: UIButton = {
         let button = UIButton(type: .system)
         button.setImage(UIImage(systemName: "cart"), for: .normal)
-        button.tintColor = AppColorEnum.tint.color
+        button.tintColor = AppColorEnum.lightWhite.color
         button.addTarget(self, action: #selector(basketButtonTapped), for: .touchUpInside)
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
@@ -41,7 +41,7 @@ final class BasketView: UIView {
         backgroundColor = AppColorEnum.tfBg.color
         layer.cornerRadius = Constants.cornerRadius
         layer.borderWidth = Constants.borderWidth
-        layer.borderColor = AppColorEnum.tint.color.cgColor
+        layer.borderColor = AppColorEnum.lightWhite.color.cgColor
         
         translatesAutoresizingMaskIntoConstraints = false
         addSubview(basketButton)

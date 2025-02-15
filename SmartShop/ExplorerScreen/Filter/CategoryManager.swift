@@ -60,7 +60,6 @@ final class CategoryManager {
         for category in categories {
             if !uniqueCategoryNames.contains(category.name) {
                 uniqueCategoryNames.insert(category.name)
-                
                 let button = createButton(for: category)
                 addButton(button, to: verticalStackView)
                 categoryButtons.append(button)
@@ -123,7 +122,7 @@ final class CategoryManager {
 // MARK: - CategoryManagerProtocol
 extension CategoryManager: CategoryManagerProtocol {
     var categoryId: String? { return selectedCategoryId }
-
+    
     func updateCategories(_ categories: [Product.Category]) {
         self.categories = categories
         createCategoryButtons()

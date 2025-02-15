@@ -36,9 +36,9 @@ final class EmptyStateView: UIView {
         btn.backgroundColor = AppColorEnum.tfBg.color
         btn.layer.cornerRadius = 16
         btn.layer.borderWidth = 2
-        btn.layer.borderColor = AppColorEnum.tint.color.cgColor
+        btn.layer.borderColor = AppColorEnum.lightWhite.color.cgColor
         btn.setTitle("Retry", for: .normal)
-        btn.setTitleColor(AppColorEnum.tint.color, for: .normal)
+        btn.setTitleColor(AppColorEnum.lightWhite.color, for: .normal)
         btn.titleLabel?.font = .boldSystemFont(ofSize: 18)
         btn.addTarget(self, action: #selector(retryButtonTapped), for: .touchUpInside)
         btn.translatesAutoresizingMaskIntoConstraints = false
@@ -48,7 +48,7 @@ final class EmptyStateView: UIView {
     private lazy var statusLabel: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.textColor = AppColorEnum.tint.color
+        label.textColor = AppColorEnum.lightWhite.color
         label.font = .italicSystemFont(ofSize: 20)
         label.textAlignment = .center
         label.text = "Nothing managed to find anything"

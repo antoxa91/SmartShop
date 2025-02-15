@@ -21,7 +21,7 @@ final class FilterTF: UITextField {
     
     private func setup() {
         self.borderStyle = .roundedRect
-        self.backgroundColor = AppColorEnum.tint.color
+        self.backgroundColor = AppColorEnum.whiteForTxInFilter.color
         self.textColor = AppColorEnum.top.color
         self.keyboardType = .numberPad
         self.setContentHuggingPriority(.defaultLow, for: .horizontal)

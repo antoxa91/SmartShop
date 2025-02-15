@@ -17,7 +17,7 @@ final class SearchTextField: UITextField {
     // MARK: Private UI Properties
     private lazy var searchIconView: UIImageView = {
         let imageView = UIImageView()
-        imageView.tintColor = AppColorEnum.tint.color
+        imageView.tintColor = AppColorEnum.lightWhite.color
         imageView.contentMode = .scaleAspectFit
         imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.image = .init(systemName: "magnifyingglass")
@@ -27,7 +27,7 @@ final class SearchTextField: UITextField {
     private lazy var filterButton: UIButton = {
         let button = UIButton(type: .system)
         button.setImage(UIImage(systemName: "slider.horizontal.3"), for: .normal)
-        button.tintColor = AppColorEnum.tint.color
+        button.tintColor = AppColorEnum.lightWhite.color
         button.addTarget(self, action: #selector(filterButtonTapped), for: .touchUpInside)
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
@@ -48,7 +48,7 @@ final class SearchTextField: UITextField {
     private func setup() {
         let placeholderAttributes = NSAttributedString(
             string: "Search item or brands...",
-            attributes: [.foregroundColor: AppColorEnum.tint.color]
+            attributes: [.foregroundColor: AppColorEnum.lightWhite.color]
         )
         let textAttributes: [NSAttributedString.Key: Any] = [
             .foregroundColor: UIColor.white,
