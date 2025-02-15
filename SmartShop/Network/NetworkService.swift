@@ -126,7 +126,6 @@ extension NetworkService: ProductsLoader {
             URLQueryItem(name: ConstantsQueryItem.offset, value: "\(offset)"),
             URLQueryItem(name: ConstantsQueryItem.limit, value: "\(limit)")
         ]) else { return }
-        print(url.absoluteString)
         
         fetchData(awaiting: [Product].self, url: url) {[weak self] result in
             guard let self else { return }
