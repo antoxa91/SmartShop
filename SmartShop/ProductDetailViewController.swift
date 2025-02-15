@@ -55,7 +55,8 @@ final class ProductDetailViewController: UIViewController {
     @objc private func shareProduct() {
         let shareText = """
         Check out this product: \(product.title)
-        Category: \(product.category)
+        
+        Category: \(product.category.name)
         Description: \(product.description)
         Price: \(product.price) $
         """
