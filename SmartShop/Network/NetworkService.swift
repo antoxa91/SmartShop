@@ -11,16 +11,19 @@ import OSLog
 protocol ProductsLoader: AnyObject {
     func fetchInitialProducts(completion: @escaping () -> Void)
     func fetchAdditionalProducts(completion: @escaping ([IndexPath]) -> Void)
+    func fetchCategories(completion: @escaping () -> Void)
     func filterByTitle(_ title: String?, completion: @escaping ([Product]) -> Void)
-    func filterByParameters(_ parameters: FilterParameters?, completion: @escaping ([Product]) -> Void)
+    func filterByParameters2(_ parameters: FilterParameters?, completion: @escaping ([Product]) -> Void)
     var products: [Product] { get }
+    var categories: [Product.Category] { get }
 }
 
 final class NetworkService {
     private enum ConstantsURLComponents {
         static let scheme = "https"
         static let host = "api.escuelajs.co"
-        static let path = "/api/v1/products"
+        static let productPath = "/api/v1/products"
+        static let categoryPath = "/api/v1/categories"
     }
     
     private enum ConstantsQueryItem {
@@ -38,19 +41,21 @@ final class NetworkService {
     private let session: URLSession
     
     var products: [Product] = []
+    var categories: [Product.Category] = []
+    
     private var offset = 0
     private let limit = 8
     private var isLoadingMoreProducts = false
-
+    
     init(session: URLSession = URLSession(configuration: .default)) {
         self.session = session
     }
     
-    private func buildURL(queryItems: [URLQueryItem]?) -> URL? {
+    private func buildURL(path: String, queryItems: [URLQueryItem]?) -> URL? {
         var urlComponents = URLComponents()
         urlComponents.scheme = ConstantsURLComponents.scheme
         urlComponents.host = ConstantsURLComponents.host
-        urlComponents.path = ConstantsURLComponents.path
+        urlComponents.path = path
         urlComponents.queryItems = queryItems
         return urlComponents.url
     }
@@ -97,8 +102,8 @@ final class NetworkService {
 extension NetworkService: ProductsLoader {
     func fetchInitialProducts(completion: @escaping () -> Void) {
         offset = 0
-
-        guard let url = buildURL(queryItems: [
+        
+        guard let url = buildURL(path: ConstantsURLComponents.productPath, queryItems: [
             URLQueryItem(name: ConstantsQueryItem.offset, value: "\(offset)"),
             URLQueryItem(name: ConstantsQueryItem.limit, value: "\(limit)")
         ]) else { return }
@@ -107,7 +112,7 @@ extension NetworkService: ProductsLoader {
             switch result {
             case .success(let response):
                 self?.products = response
-
+                
                 DispatchQueue.main.async {
                     completion()
                 }
@@ -122,7 +127,7 @@ extension NetworkService: ProductsLoader {
         guard !isLoadingMoreProducts else { return }
         isLoadingMoreProducts = true
         
-        guard let url = buildURL(queryItems: [
+        guard let url = buildURL(path: ConstantsURLComponents.productPath, queryItems: [
             URLQueryItem(name: ConstantsQueryItem.offset, value: "\(offset)"),
             URLQueryItem(name: ConstantsQueryItem.limit, value: "\(limit)")
         ]) else { return }
@@ -143,7 +148,7 @@ extension NetworkService: ProductsLoader {
                 
                 self.products.append(contentsOf: moreResults)
                 self.offset += self.limit
-
+                
                 self.isLoadingMoreProducts = false
                 DispatchQueue.main.async {
                     completion(indexPathsToAdd)
@@ -156,6 +161,24 @@ extension NetworkService: ProductsLoader {
         }
     }
     
+    func fetchCategories(completion: @escaping () -> Void) {
+        guard let url = buildURL(path: ConstantsURLComponents.categoryPath, queryItems: nil) else { return }
+        
+        fetchData(awaiting: [Product.Category].self, url: url) {[weak self] result in
+            switch result {
+            case .success(let response):
+                self?.categories = response
+                
+                DispatchQueue.main.async {
+                    completion()
+                }
+            case .failure(let error):
+                Logger.network.error("Error loading products: \(error.localizedDescription)")
+                completion()
+            }
+        }
+    }
+    
     // MARK: Filters
     func filterByTitle(_ title: String?, completion: @escaping ([Product]) -> Void) {
         let queryItems = [
@@ -164,24 +187,23 @@ extension NetworkService: ProductsLoader {
         filterProducts(with: queryItems, completion: completion)
     }
     
-    func filterByParameters(_ parameters: FilterParameters?, completion: @escaping ([Product]) -> Void) {
+    func filterByParameters2(_ parameters: FilterParameters?, completion: @escaping ([Product]) -> Void) {
         let queryItems = [
             URLQueryItem(name: ConstantsQueryItem.price, value: parameters?.price),
             URLQueryItem(name: ConstantsQueryItem.priceMin, value: parameters?.priceMin),
             URLQueryItem(name: ConstantsQueryItem.priceMax, value: parameters?.priceMax),
-            URLQueryItem(name: ConstantsQueryItem.categoryId, value: parameters?.categoryId)
         ]
         
         filterProducts(with: queryItems, completion: completion)
     }
     
     private func filterProducts(with queryItems: [URLQueryItem], completion: @escaping ([Product]) -> Void) {
-        guard let url = buildURL(queryItems: queryItems) else {
+        guard let url = buildURL(path: ConstantsURLComponents.productPath, queryItems: queryItems) else {
             Logger.network.error("Failed to build URL for filtering with query items: \(queryItems)")
             completion([])
             return
         }
-
+        
         fetchData(awaiting: [Product].self, url: url) { result in
             switch result {
             case .success(let response):
