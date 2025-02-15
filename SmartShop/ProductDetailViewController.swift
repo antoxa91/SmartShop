@@ -13,7 +13,7 @@ final class ProductDetailViewController: UIViewController {
     private let product: Product
     private let imageLoader: ImageLoaderProtocol
     private lazy var productDetailView = ProductDetailView(imageLoader: imageLoader)
-
+    
     // MARK: Init
     init(product: Product, imageLoader: ImageLoaderProtocol) {
         self.product = product
@@ -39,6 +39,7 @@ final class ProductDetailViewController: UIViewController {
         view.backgroundColor = AppColorEnum.lightWhite.color
         view.addSubview(productDetailView)
         productDetailView.configure(with: product)
+        productDetailView.delegate = self
         navigationItem.rightBarButtonItem = .init(barButtonSystemItem: .action, target: self, action:  #selector(shareProduct))
     }
     
@@ -52,6 +53,23 @@ final class ProductDetailViewController: UIViewController {
     }
     
     @objc private func shareProduct() {
-        print(#function)
+        let shareText = """
+        Check out this product: \(product.title)
+        Category: \(product.category)
+        Description: \(product.description)
+        Price: \(product.price) $
+        """
+        
+        let activityViewController = UIActivityViewController(activityItems: [shareText], applicationActivities: nil)
+        present(activityViewController, animated: true, completion: nil)
+        Logger.productDetailVC.info("User shared product: \(self.product.title)")
+    }
+    
+}
+
+// MARK: - ProductDetailViewDelegate
+extension ProductDetailViewController: ProductDetailViewDelegate {
+    func didTapAddToCart() {
+        Logger.productDetailVC.info("User add to card product: \(self.product.title)")
     }
 }
