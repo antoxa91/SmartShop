@@ -12,22 +12,27 @@ protocol FilterViewDataSource: AnyObject {
     var minPriceText: String? { get }
     var maxPriceText: String? { get }
     var categoryButtons: UIView { get }
-    func setApplyButtonAction(target: Any?, action: Selector)
 }
 
+protocol FilterViewDelegate: AnyObject {
+    func setApplyButtonAction()
+    func resetFilters()
+}
 
 final class FilterView: UIView {
     private enum Constants {
         static let stackViewSpacing: CGFloat = 20
-        static let buttonHeight: CGFloat = 50
-        static let buttonBorderWidth: CGFloat = 2
-        static let buttonCornerRadius: CGFloat = 12
-        static let buttonFontSize: CGFloat = 18
         static let horizontalStackViewSpacing: CGFloat = 10
         static let mainStackViewMargin: CGFloat = 20
-        static let buttonBottomMargin: CGFloat = -20
+        static let applyButtonHeight: CGFloat = 40
+        static let applyButtonBorderWidth: CGFloat = 2
+        static let applyButtonCornerRadius: CGFloat = 12
+        static let applyButtonFontSize: CGFloat = 18
+        static let applyButtonBottomMargin: CGFloat = -8
+        static let applyButtonWidthMultiplier = 0.6
+        static let resetButtonWidth: CGFloat = 40
     }
-    
+    weak var delegate: FilterViewDelegate?
     // MARK: UI Properties
     private lazy var priceTextField = FilterTF(placeholder: "Enter price")
     private lazy var minPriceTextField = FilterTF(placeholder: "Min price")
@@ -36,21 +41,32 @@ final class FilterView: UIView {
     private lazy var priceLabel = FilterLabel(text: "Price")
     private lazy var priceFromLabel = FilterLabel(text: "Price from")
     private lazy var priceToLabel = FilterLabel(text: "to")
-    private lazy var categoryLabel = FilterLabel(text: "Categories")
+    private lazy var categoryLabel = FilterLabel(text: "Filter by Categories:")
     
-    private lazy var applyButton: UIButton = {
+    private lazy var resetButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("Apply Filters", for: .normal)
-        button.titleLabel?.font = .boldSystemFont(ofSize: Constants.buttonFontSize)
-        button.setTitleColor(AppColorEnum.lightWhite.color, for: .normal)
-        button.backgroundColor = AppColorEnum.top.color
-        button.layer.borderColor = AppColorEnum.tfBg.color.cgColor
-        button.layer.borderWidth = Constants.buttonBorderWidth
-        button.layer.cornerRadius = Constants.buttonCornerRadius
+        button.tintColor = .black
+        button.layer.cornerRadius = Constants.resetButtonWidth / 2
+        button.setImage(.init(systemName: "arrow.clockwise"), for: .normal)
+        button.addTarget(self, action: #selector(resetButtonTapped), for: .touchUpInside)
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
     
+    private lazy var applyButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setTitle("Apply Filters", for: .normal)
+        button.titleLabel?.font = .boldSystemFont(ofSize: Constants.applyButtonFontSize)
+        button.setTitleColor(AppColorEnum.lightWhite.color, for: .normal)
+        button.backgroundColor = AppColorEnum.top.color
+        button.layer.borderColor = AppColorEnum.tfBg.color.cgColor
+        button.layer.borderWidth = Constants.applyButtonBorderWidth
+        button.layer.cornerRadius = Constants.applyButtonCornerRadius
+        button.addTarget(self, action: #selector(applyButtonTapped), for: .touchUpInside)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
+    }()
+
     private lazy var mainStackView: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .vertical
@@ -86,19 +102,28 @@ final class FilterView: UIView {
         mainStackView.addArrangedSubview(minMaxPriceStackView)
         mainStackView.addArrangedSubview(categoryLabel)
         mainStackView.addArrangedSubview(categoryButtonsContainerView)
-        addSubviews(mainStackView, applyButton)
+        addSubviews(mainStackView, applyButton, resetButton)
     }
     
     private func setConstraints() {
         NSLayoutConstraint.activate([
-            mainStackView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor, constant: Constants.mainStackViewMargin),
-            mainStackView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: Constants.mainStackViewMargin),
-            mainStackView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -Constants.mainStackViewMargin),
+            resetButton.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor,
+                                             constant: Constants.mainStackViewMargin/2),
+            resetButton.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -Constants.mainStackViewMargin),
+            resetButton.heightAnchor.constraint(equalToConstant: Constants.resetButtonWidth),
+            resetButton.widthAnchor.constraint(equalToConstant: Constants.resetButtonWidth),
             
-            applyButton.leadingAnchor.constraint(equalTo: leadingAnchor, constant: Constants.mainStackViewMargin),
-            applyButton.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -Constants.mainStackViewMargin),
-            applyButton.heightAnchor.constraint(equalToConstant: Constants.buttonHeight),
-            applyButton.bottomAnchor.constraint(equalTo: keyboardLayoutGuide.topAnchor, constant: Constants.buttonBottomMargin)
+            mainStackView.topAnchor.constraint(equalTo: resetButton.bottomAnchor, constant: 8),
+            mainStackView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: Constants.mainStackViewMargin),
+            mainStackView.trailingAnchor.constraint(equalTo: trailingAnchor,
+                                                    constant: -Constants.mainStackViewMargin),
+            
+            applyButton.centerXAnchor.constraint(equalTo: centerXAnchor),
+            applyButton.widthAnchor.constraint(equalTo: widthAnchor,
+                                               multiplier: Constants.applyButtonWidthMultiplier),
+            applyButton.heightAnchor.constraint(equalToConstant: Constants.applyButtonHeight),
+            applyButton.bottomAnchor.constraint(equalTo: keyboardLayoutGuide.topAnchor,
+                                                constant: Constants.applyButtonBottomMargin)
         ])
     }
     
@@ -110,6 +135,21 @@ final class FilterView: UIView {
         stackView.alignment = .center
         return stackView
     }
+    
+    // MARK: Action
+    @objc private func resetButtonTapped() {
+        let rotationAnimation = CABasicAnimation(keyPath: "transform.rotation")
+        rotationAnimation.fromValue = 0.0
+        rotationAnimation.toValue = .pi * 2.0
+        rotationAnimation.duration = 0.3
+        rotationAnimation.repeatCount = 1
+        resetButton.layer.add(rotationAnimation, forKey: "rotationAnimation")
+        delegate?.resetFilters()
+    }
+    
+    @objc private func applyButtonTapped() {
+        delegate?.setApplyButtonAction()
+    }
 }
 
 // MARK: - FilterViewDataSource
@@ -118,8 +158,4 @@ extension FilterView: FilterViewDataSource {
     var minPriceText: String? { return minPriceTextField.text }
     var maxPriceText: String? { return maxPriceTextField.text }
     var categoryButtons: UIView { return categoryButtonsContainerView }
-    
-    func setApplyButtonAction(target: Any?, action: Selector) {
-        applyButton.addTarget(target, action: action, for: .touchUpInside)
-    }
 }
