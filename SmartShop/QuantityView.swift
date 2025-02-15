@@ -10,7 +10,7 @@ import UIKit
 final class QuantityView: UIView {
     // MARK: Private UI Properties
     private lazy var counterLabel = ProductLabel(text: "1", font: .systemFont(ofSize: 18, weight: .semibold), textAlignment: .center)
-
+    
     private let configForButton = UIImage.SymbolConfiguration(pointSize: 20, weight: .regular, scale: .default)
     private lazy var minusButton: UIButton = {
         let button = UIButton(type: .system)
@@ -19,7 +19,7 @@ final class QuantityView: UIView {
         button.backgroundColor = AppColorEnum.gray.color
         button.layer.cornerRadius = 8
         button.layer.maskedCorners = [.layerMinXMaxYCorner, .layerMinXMinYCorner]
-       button.addTarget(self, action: #selector(minusButtonTapped), for: .touchUpInside)
+        button.addTarget(self, action: #selector(minusButtonTapped), for: .touchUpInside)
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
@@ -36,7 +36,11 @@ final class QuantityView: UIView {
         return button
     }()
     
-    private var counter = 2
+    private var counter = 1 {
+        didSet {
+            counterLabel.text = "\(counter)"
+        }
+    }
     
     // MARK: Init
     override init(frame: CGRect) {
@@ -69,7 +73,7 @@ final class QuantityView: UIView {
             minusButton.leadingAnchor.constraint(equalTo: leadingAnchor),
             minusButton.bottomAnchor.constraint(equalTo: bottomAnchor),
             minusButton.widthAnchor.constraint(equalTo: heightAnchor),
-
+            
             plusButton.topAnchor.constraint(equalTo: topAnchor),
             plusButton.trailingAnchor.constraint(equalTo: trailingAnchor),
             plusButton.bottomAnchor.constraint(equalTo: bottomAnchor),
@@ -84,8 +88,8 @@ final class QuantityView: UIView {
     
     // MARK: Action
     @objc private func minusButtonTapped() {
+        animateButton(minusButton)
         counter -= 1
-        counterLabel.text = "\(counter)"
         
         if counter <= 1 {
             minusButton.isEnabled = false
@@ -93,8 +97,19 @@ final class QuantityView: UIView {
     }
     
     @objc func plusButtonTapped() {
+        animateButton(plusButton)
         counter += 1
-        counterLabel.text = "\(counter)"
         minusButton.isEnabled = true
+    }
+    
+    // MARK: Animation
+    private func animateButton(_ button: UIButton) {
+        UIView.animate(withDuration: 0.1, animations: {
+            button.transform = CGAffineTransform(scaleX: 0.9, y: 0.9)
+        }) { _ in
+            UIView.animate(withDuration: 0.1) {
+                button.transform = .identity
+            }
+        }
     }
 }
