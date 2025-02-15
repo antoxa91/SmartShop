@@ -73,7 +73,8 @@ extension ExplorerListCollectionViewCell: ConfigurableViewProtocol {
     typealias ConfigirationModel = Product
     
     func configure(with model: Product) {
-        guard let imageUrlString = model.images.first, let url = URL(string: imageUrlString) else {
+        guard let cleanUrlString = model.images.first?.cleanedURLString(),
+              let url = URL(string: cleanUrlString) else {
             Logger.cell.error("Error: Invalid URL for Image: \(model.images.first ?? "No image URL")")
             setPlaceholderImage()
             return
