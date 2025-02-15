@@ -16,6 +16,8 @@ enum AppColorEnum {
     case tfBg
     case lightWhite
     case salad
+    case gray
+    case lightGray
 
     var color: UIColor {
         switch self {
@@ -35,6 +37,10 @@ enum AppColorEnum {
             return UIColor(hex: "#EAEAEA")
         case .salad:
             return UIColor(hex: "#68CA21")
+        case .gray:
+            return UIColor(hex: "#BBBDBF")
+        case .lightGray:
+            return UIColor(hex: "#E5E5E5")
         }
     }
 }
