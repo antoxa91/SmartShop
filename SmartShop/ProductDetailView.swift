@@ -26,15 +26,8 @@ final class ProductDetailView: UIView {
     private let imageLoader: ImageLoaderProtocol
     
     // MARK: Private UI Properties
-    private lazy var productImageView: UIImageView = {
-        let imageView = UIImageView()
-        imageView.contentMode = .scaleAspectFill
-        imageView.clipsToBounds = true
-        imageView.translatesAutoresizingMaskIntoConstraints = false
-        imageView.backgroundColor = AppColorEnum.appBackground.color
-        return imageView
-    }()
-    
+    private let productImagePageViewController: ProductImagePageViewController
+
     private lazy var descriptionLabel = ProductLabel(font: .systemFont(ofSize: 18, weight: .bold),
                                                      numberOfLines: 0)
     private lazy var priceLabel = ProductLabel(textColor: AppColorEnum.salad.color,
@@ -75,6 +68,7 @@ final class ProductDetailView: UIView {
          imageLoader: ImageLoaderProtocol
     ) {
         self.imageLoader = imageLoader
+        self.productImagePageViewController = ProductImagePageViewController(imageLoader: imageLoader)
         super.init(frame: frame)
         setupView()
         setConstraints()
@@ -89,7 +83,7 @@ final class ProductDetailView: UIView {
     private func setupView() {
         translatesAutoresizingMaskIntoConstraints = false
         backgroundColor = AppColorEnum.lightWhite.color
-        addSubviews(productImageView, scrollView, addToCartButton, quantityView)
+        addSubviews(productImagePageViewController.view, scrollView, addToCartButton, quantityView)
         scrollView.addSubviews(contentView, categoryLabel, descriptionLabel, priceLabel)
         configureAddToCartButton(isAddedToCart: false)
     }
@@ -127,13 +121,13 @@ final class ProductDetailView: UIView {
     // MARK: Layout
     private func setConstraints() {
         NSLayoutConstraint.activate([
-            productImageView.topAnchor.constraint(equalTo: topAnchor),
-            productImageView.leadingAnchor.constraint(equalTo: leadingAnchor),
-            productImageView.trailingAnchor.constraint(equalTo: trailingAnchor),
-            productImageView.heightAnchor.constraint(equalTo: heightAnchor,
+            productImagePageViewController.view.topAnchor.constraint(equalTo: topAnchor),
+            productImagePageViewController.view.leadingAnchor.constraint(equalTo: leadingAnchor),
+            productImagePageViewController.view.trailingAnchor.constraint(equalTo: trailingAnchor),
+            productImagePageViewController.view.heightAnchor.constraint(equalTo: heightAnchor,
                                                      multiplier: Constants.imageHeightMultiplier),
             
-            scrollView.topAnchor.constraint(equalTo: productImageView.bottomAnchor),
+            scrollView.topAnchor.constraint(equalTo: productImagePageViewController.view.bottomAnchor),
             scrollView.leadingAnchor.constraint(equalTo: leadingAnchor),
             scrollView.trailingAnchor.constraint(equalTo: trailingAnchor),
             scrollView.bottomAnchor.constraint(equalTo: addToCartButton.topAnchor),
@@ -196,32 +190,6 @@ extension ProductDetailView: ConfigurableViewProtocol {
         descriptionLabel.text = model.description
         priceLabel.text = "$ \(model.price)"
         categoryLabel.text = "Category -> \(model.category.name)"
-        fetchProductImage(model: model)
-    }
-    
-    private func fetchProductImage(model: Product) {
-        guard let imageUrlString = model.images.first, let url = URL(string: imageUrlString) else {
-            Logger.cell.error("Error: Invalid URL for Image: \(model.images.first ?? "No image URL")")
-            setPlaceholderImage()
-            return
-        }
-        
-        imageLoader.fetchImage(with: url) { [weak self] image in
-            DispatchQueue.main.async {
-                guard let image else {
-                    self?.setPlaceholderImage()
-                    return
-                }
-                self?.productImageView.image = image
-                UIView.animate(withDuration: 0.3, animations: {
-                    self?.productImageView.alpha = 1
-                })
-            }
-        }
-    }
-    
-    private func setPlaceholderImage() {
-        productImageView.image = .imageNotFound
-        productImageView.alpha = 1
+        productImagePageViewController.configure(with: model.images)
     }
 }
