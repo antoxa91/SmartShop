@@ -8,9 +8,23 @@
 import UIKit
 import OSLog
 
-final class ProductDetailView: UIView {
-    private let imageLoader: ImageLoaderProtocol
+protocol ProductDetailViewDelegate: AnyObject {
+    func didTapAddToCart()
+}
 
+final class ProductDetailView: UIView {
+    weak var delegate: ProductDetailViewDelegate?
+    
+    private enum Constants {
+        static let defaultPadding: CGFloat = 8
+        static let buttonHeight: CGFloat = 45
+        static let imageHeightMultiplier: CGFloat = 0.6
+        static let buttonWidthMultiplier: CGFloat = 0.56
+        static let quantityViewWidthMultiplier: CGFloat = 0.35
+    }
+    
+    private let imageLoader: ImageLoaderProtocol
+    
     // MARK: Private UI Properties
     private lazy var productImageView: UIImageView = {
         let imageView = UIImageView()
@@ -40,19 +54,16 @@ final class ProductDetailView: UIView {
         return view
     }()
     
-    /// TODO: - обработать нажатие - добавить action, измение цвета, текста,
     private lazy var addToCartButton: UIButton = {
         let button = UIButton(type: .system)
         var config = UIButton.Configuration.filled()
         config.cornerStyle = .medium
-        config.image = UIImage(systemName: "cart")
-        config.imagePadding = 7
+        config.imagePadding = 16
         config.imagePlacement = .leading
-        config.title = "Add to Cart"
-        config.baseBackgroundColor = AppColorEnum.tfBg.color
-        config.buttonSize = .medium
+        config.preferredSymbolConfigurationForImage = .init(pointSize: 18, weight: .semibold)
         button.configuration = config
-        config.baseForegroundColor = AppColorEnum.lightWhite.color
+        
+        button.addTarget(self, action: #selector(addToCartButtonTapped), for: .touchUpInside)
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
@@ -80,6 +91,37 @@ final class ProductDetailView: UIView {
         backgroundColor = AppColorEnum.lightWhite.color
         addSubviews(productImageView, scrollView, addToCartButton, quantityView)
         scrollView.addSubviews(contentView, categoryLabel, descriptionLabel, priceLabel)
+        configureAddToCartButton(isAddedToCart: false)
+    }
+    
+    private func configureAddToCartButton(isAddedToCart: Bool) {
+        var config = addToCartButton.configuration
+        if isAddedToCart {
+            config?.baseBackgroundColor = AppColorEnum.lightGray.color
+            config?.background.strokeWidth = 2
+            config?.background.strokeColor = AppColorEnum.tfBg.color
+            config?.baseForegroundColor = AppColorEnum.tfBg.color
+            config?.image = nil
+            let attributedTitle = AttributedString("To the Shopping List", attributes: .init([
+                .font: UIFont.systemFont(ofSize: 19, weight: .semibold),
+                .foregroundColor: AppColorEnum.tfBg.color
+            ]))
+            config?.attributedTitle = attributedTitle
+            
+            UIView.transition(with: self.addToCartButton, duration: 0.3, options: .transitionCrossDissolve, animations: {
+                self.addToCartButton.setNeedsLayout()
+                self.addToCartButton.layoutIfNeeded()
+            })
+        } else {
+            config?.baseBackgroundColor = AppColorEnum.tfBg.color
+            config?.image = UIImage(systemName: "cart")
+            let attributedTitle = AttributedString("Add to Cart", attributes: .init([
+                .font: UIFont.systemFont(ofSize: 18, weight: .semibold),
+                .foregroundColor: AppColorEnum.lightWhite.color
+            ]))
+            config?.attributedTitle = attributedTitle
+        }
+        addToCartButton.configuration = config
     }
     
     // MARK: Layout
@@ -88,44 +130,62 @@ final class ProductDetailView: UIView {
             productImageView.topAnchor.constraint(equalTo: topAnchor),
             productImageView.leadingAnchor.constraint(equalTo: leadingAnchor),
             productImageView.trailingAnchor.constraint(equalTo: trailingAnchor),
-            productImageView.heightAnchor.constraint(equalTo: heightAnchor, multiplier: 0.6),
-
+            productImageView.heightAnchor.constraint(equalTo: heightAnchor,
+                                                     multiplier: Constants.imageHeightMultiplier),
+            
             scrollView.topAnchor.constraint(equalTo: productImageView.bottomAnchor),
             scrollView.leadingAnchor.constraint(equalTo: leadingAnchor),
             scrollView.trailingAnchor.constraint(equalTo: trailingAnchor),
             scrollView.bottomAnchor.constraint(equalTo: addToCartButton.topAnchor),
-
+            
             contentView.topAnchor.constraint(equalTo: scrollView.topAnchor),
             contentView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
             contentView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
             contentView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
             contentView.widthAnchor.constraint(equalTo: scrollView.widthAnchor),
-
-            categoryLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 8),
-            categoryLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 8),
-            categoryLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -8),
-
-            descriptionLabel.topAnchor.constraint(equalTo: categoryLabel.bottomAnchor, constant: 8),
-            descriptionLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 8),
-            descriptionLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -8),
-
-            priceLabel.topAnchor.constraint(equalTo: descriptionLabel.bottomAnchor, constant: 8),
-            priceLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 8),
-            priceLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -8),
-            priceLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -8),
-
-            addToCartButton.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 8),
-            addToCartButton.widthAnchor.constraint(equalTo: widthAnchor, multiplier: 0.45),
-            addToCartButton.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -8),
-            addToCartButton.heightAnchor.constraint(equalToConstant: 45),
-
-            quantityView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -8),
-            quantityView.widthAnchor.constraint(equalTo: widthAnchor, multiplier: 0.45),
-            quantityView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -8),
-            quantityView.heightAnchor.constraint(equalToConstant: 45),
+            
+            categoryLabel.topAnchor.constraint(equalTo: contentView.topAnchor,
+                                               constant: Constants.defaultPadding),
+            categoryLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor,
+                                                   constant: Constants.defaultPadding),
+            categoryLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor,
+                                                    constant: -Constants.defaultPadding),
+            
+            descriptionLabel.topAnchor.constraint(equalTo: categoryLabel.bottomAnchor,
+                                                  constant: Constants.defaultPadding),
+            descriptionLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor,
+                                                      constant: Constants.defaultPadding),
+            descriptionLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor,
+                                                       constant: -Constants.defaultPadding),
+            
+            priceLabel.topAnchor.constraint(equalTo: descriptionLabel.bottomAnchor,
+                                            constant: Constants.defaultPadding),
+            priceLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor,
+                                                constant: Constants.defaultPadding),
+            priceLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor,
+                                                 constant: -Constants.defaultPadding),
+            priceLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor,
+                                               constant: -Constants.defaultPadding),
+            
+            addToCartButton.leadingAnchor.constraint(equalTo: leadingAnchor, constant: Constants.defaultPadding),
+            addToCartButton.widthAnchor.constraint(equalTo: widthAnchor,
+                                                   multiplier: Constants.buttonWidthMultiplier),
+            addToCartButton.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -Constants.defaultPadding),
+            addToCartButton.heightAnchor.constraint(equalToConstant: Constants.buttonHeight),
+            
+            quantityView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -Constants.defaultPadding),
+            quantityView.widthAnchor.constraint(equalTo: widthAnchor,
+                                                multiplier: Constants.quantityViewWidthMultiplier),
+            quantityView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -Constants.defaultPadding),
+            quantityView.heightAnchor.constraint(equalToConstant: Constants.buttonHeight)
         ])
     }
-
+    
+    // MARK: Action
+    @objc private func addToCartButtonTapped() {
+        configureAddToCartButton(isAddedToCart: true)
+        delegate?.didTapAddToCart()
+    }
 }
 
 // MARK: - ConfigurableViewProtocol
