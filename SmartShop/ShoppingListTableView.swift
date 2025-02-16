@@ -13,11 +13,11 @@ protocol ShoppingListTableViewDelegate: AnyObject {
 
 final class ShoppingListTableView: UITableView {
     weak var shoppingListTableViewDelegate: ShoppingListTableViewDelegate?
-    private var cartItem: [CartItem] = []
+    private var cartItems: [CartItem] = []
     
     // MARK: Init
-    init(cartItem: [CartItem]) {
-        self.cartItem = cartItem
+    init(cartItems: [CartItem]) {
+        self.cartItems = cartItems
         super.init(frame: .zero, style: .plain)
         setup()
     }
@@ -44,21 +44,21 @@ final class ShoppingListTableView: UITableView {
 // MARK: - UITableViewDataSource
 extension ShoppingListTableView: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        cartItem.count
+        cartItems.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: ShoppingListTableViewCell.identifier, for: indexPath) as? ShoppingListTableViewCell else {
             return UITableViewCell()
         }
-        let cartItem = cartItem[indexPath.row]
+        let cartItem = cartItems[indexPath.row]
         cell.configure(with: cartItem.product, quantity: cartItem.quantity)
         return cell
     }
     
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
-            cartItem.remove(at: indexPath.row)
+            cartItems.remove(at: indexPath.row)
             tableView.deleteRows(at: [indexPath], with: .automatic)
         }
     }
@@ -78,12 +78,12 @@ extension ShoppingListTableView: UITableViewDelegate {
                     cell.alpha = 0
                     cell.layer.zPosition = -1
                 }, completion: { _ in
-                    self.cartItem.remove(at: indexPath.row)
+                    self.cartItems.remove(at: indexPath.row)
                     tableView.deleteRows(at: [indexPath], with: .automatic)
                     completionHandler(true)
                 })
             } else {
-                self.cartItem.remove(at: indexPath.row)
+                self.cartItems.remove(at: indexPath.row)
                 tableView.deleteRows(at: [indexPath], with: .automatic)
                 completionHandler(true)
             }
