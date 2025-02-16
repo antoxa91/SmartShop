@@ -40,17 +40,24 @@ final class FilterViewController: UIViewController {
     // MARK: Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupActions()
         loadCategories()
+        filterView.delegate = self
     }
     
-    // MARK: Setup Actions
-    private func setupActions() {
-        filterView.setApplyButtonAction(target: self, action: #selector(applyFilters))
+    // MARK: Load Categories
+    private func loadCategories() {
+        networkService.fetchCategories { [weak self] in
+            DispatchQueue.main.async {
+                guard let categories = self?.networkService.categories else { return }
+                self?.categoryManager.updateCategories(categories)
+            }
+        }
     }
-    
-    // MARK: Actions
-    @objc private func applyFilters() {
+}
+
+// MARK: - FilterViewDelegate
+extension FilterViewController: FilterViewDelegate {
+    func setApplyButtonAction() {
         let parameters = FilterParameters(
             price: filterView.priceText,
             priceMin: filterView.minPriceText,
@@ -61,17 +68,20 @@ final class FilterViewController: UIViewController {
         
         let categoryId = categoryManager.categoryId ?? ""
         viewModel?.updateSelectedCategories(categoryId)
-        
         dismiss(animated: true)
     }
     
-    // MARK: Load Categories
-    private func loadCategories() {
-        networkService.fetchInitialProducts { [weak self] in
-            DispatchQueue.main.async {
-                let categories = self?.networkService.products.map { $0.category } ?? []
-                self?.categoryManager.updateCategories(categories)
-            }
+    func resetFilters() {
+        let param = FilterParameters(
+            price: "",
+            priceMin: "",
+            priceMax: "",
+            categoryId: ""
+        )
+        
+        viewModel?.filterByParameters(param)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            self.dismiss(animated: true)
         }
     }
 }
