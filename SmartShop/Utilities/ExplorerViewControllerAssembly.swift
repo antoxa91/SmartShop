@@ -22,10 +22,10 @@ struct ExplorerViewControllerAssembly {
     private func configureNavigationBarAppearance() {
         let appearance = UINavigationBarAppearance()
         appearance.configureWithOpaqueBackground()
-        appearance.backgroundColor = AppColorEnum.appBackground.color
-        appearance.titleTextAttributes = [.foregroundColor: AppColorEnum.tfBg.color]
+        appearance.backgroundColor = AppColorEnum.darkGreen.color
+        appearance.titleTextAttributes = [.foregroundColor: AppColorEnum.veryDarkGreen.color]
         
         UINavigationBar.appearance().standardAppearance = appearance
-        UINavigationBar.appearance().tintColor = AppColorEnum.tfBg.color
+        UINavigationBar.appearance().tintColor = AppColorEnum.veryDarkGreen.color
     }
 }

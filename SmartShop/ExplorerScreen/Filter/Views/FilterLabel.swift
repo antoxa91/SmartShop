@@ -21,7 +21,7 @@ final class FilterLabel: UILabel {
     
     private func setup() {
         self.font = .boldSystemFont(ofSize: 17)
-        self.textColor = AppColorEnum.top.color
+        self.textColor = AppColorEnum.green.color
         self.setContentHuggingPriority(.defaultHigh, for: .horizontal)
         self.translatesAutoresizingMaskIntoConstraints = false
     }

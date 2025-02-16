@@ -8,7 +8,7 @@
 import UIKit
 
 final class ProductLabel: UILabel {
-    init(text: String = "", textColor: UIColor = .black, font: UIFont, numberOfLines: Int = 1, textAlignment: NSTextAlignment = .left) {
+    init(text: String = "", textColor: UIColor = AppColorEnum.black.color, font: UIFont, numberOfLines: Int = 1, textAlignment: NSTextAlignment = .left) {
         super.init(frame: .zero)
         self.text = text
         self.textColor = textColor

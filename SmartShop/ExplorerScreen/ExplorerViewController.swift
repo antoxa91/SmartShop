@@ -40,7 +40,7 @@ final class ExplorerViewController: UIViewController {
     
     // MARK: Setup
     private func setupView() {
-        view.backgroundColor = AppColorEnum.appBackground.color
+        view.backgroundColor = AppColorEnum.darkGreen.color
         view.addSubviews(explorerListView)
         navigationItem.backButtonDisplayMode = .minimal
     }

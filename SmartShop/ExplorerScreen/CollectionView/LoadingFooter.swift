@@ -14,7 +14,7 @@ final class LoadingFooter: UICollectionReusableView {
         let indicator = UIActivityIndicatorView(style: .large)
         indicator.hidesWhenStopped = true
         indicator.translatesAutoresizingMaskIntoConstraints = false
-        indicator.color = AppColorEnum.tfBg.color
+        indicator.color = AppColorEnum.veryDarkGreen.color
         return indicator
     }()
     

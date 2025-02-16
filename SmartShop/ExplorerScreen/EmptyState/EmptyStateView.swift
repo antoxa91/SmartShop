@@ -33,7 +33,7 @@ final class EmptyStateView: UIView {
     
     private lazy var retryButton: UIButton = {
         let btn = UIButton(type: .system)
-        btn.backgroundColor = AppColorEnum.tfBg.color
+        btn.backgroundColor = AppColorEnum.veryDarkGreen.color
         btn.layer.cornerRadius = 16
         btn.layer.borderWidth = 2
         btn.layer.borderColor = AppColorEnum.lightWhite.color.cgColor
@@ -71,7 +71,7 @@ final class EmptyStateView: UIView {
     // MARK: Setup
     private func setupView() {
         translatesAutoresizingMaskIntoConstraints = false
-        backgroundColor = AppColorEnum.appBackground.color
+        backgroundColor = AppColorEnum.darkGreen.color
         addSubviews(emptyStateImageView, retryButton, statusLabel)
     }
     

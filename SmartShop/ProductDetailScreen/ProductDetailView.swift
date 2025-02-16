@@ -93,12 +93,12 @@ final class ProductDetailView: UIView {
         if isAddedToCart {
             config?.baseBackgroundColor = AppColorEnum.lightGray.color
             config?.background.strokeWidth = 2
-            config?.background.strokeColor = AppColorEnum.tfBg.color
-            config?.baseForegroundColor = AppColorEnum.tfBg.color
+            config?.background.strokeColor = AppColorEnum.veryDarkGreen.color
+            config?.baseForegroundColor = AppColorEnum.veryDarkGreen.color
             config?.image = nil
             let attributedTitle = AttributedString("To the Shopping List", attributes: .init([
                 .font: UIFont.systemFont(ofSize: 19, weight: .semibold),
-                .foregroundColor: AppColorEnum.tfBg.color
+                .foregroundColor: AppColorEnum.veryDarkGreen.color
             ]))
             config?.attributedTitle = attributedTitle
             
@@ -107,7 +107,7 @@ final class ProductDetailView: UIView {
                 self.addToCartButton.layoutIfNeeded()
             })
         } else {
-            config?.baseBackgroundColor = AppColorEnum.tfBg.color
+            config?.baseBackgroundColor = AppColorEnum.veryDarkGreen.color
             config?.image = UIImage(systemName: "cart")
             let attributedTitle = AttributedString("Add to Cart", attributes: .init([
                 .font: UIFont.systemFont(ofSize: 18, weight: .semibold),

@@ -71,9 +71,9 @@ final class CategoryManager {
         let button = UIButton(type: .system)
         button.setTitle(category.name, for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: Constants.buttonFontSize)
-        button.setTitleColor(AppColorEnum.top.color, for: .normal)
-        button.backgroundColor = AppColorEnum.collectionView.color
-        button.layer.borderColor = AppColorEnum.tfBg.color.cgColor
+        button.setTitleColor(AppColorEnum.green.color, for: .normal)
+        button.backgroundColor = AppColorEnum.middleLightGreen.color
+        button.layer.borderColor = AppColorEnum.veryDarkGreen.color.cgColor
         button.layer.cornerRadius = Constants.buttonCornerRadius
         button.addTarget(self, action: #selector(categoryButtonTapped(_:)), for: .touchUpInside)
         button.translatesAutoresizingMaskIntoConstraints = false

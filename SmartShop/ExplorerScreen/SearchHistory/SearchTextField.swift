@@ -57,7 +57,7 @@ final class SearchTextField: UITextField {
         attributedPlaceholder = placeholderAttributes
         defaultTextAttributes = textAttributes
         
-        backgroundColor = AppColorEnum.tfBg.color
+        backgroundColor = AppColorEnum.veryDarkGreen.color
         layer.cornerRadius = 15
         returnKeyType = .search
         

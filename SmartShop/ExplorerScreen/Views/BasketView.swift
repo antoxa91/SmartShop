@@ -38,7 +38,7 @@ final class BasketView: UIView {
     
     // MARK: Setup
     private func setupView() {
-        backgroundColor = AppColorEnum.tfBg.color
+        backgroundColor = AppColorEnum.veryDarkGreen.color
         layer.cornerRadius = Constants.cornerRadius
         layer.borderWidth = Constants.borderWidth
         layer.borderColor = AppColorEnum.lightWhite.color.cgColor

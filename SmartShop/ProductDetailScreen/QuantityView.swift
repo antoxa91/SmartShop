@@ -15,7 +15,7 @@ final class QuantityView: UIView {
     private lazy var minusButton: UIButton = {
         let button = UIButton(type: .system)
         button.setImage(UIImage(systemName: "minus", withConfiguration: configForButton), for: .normal)
-        button.tintColor = .black
+        button.tintColor = AppColorEnum.black.color
         button.backgroundColor = AppColorEnum.gray.color
         button.layer.cornerRadius = 8
         button.layer.maskedCorners = [.layerMinXMaxYCorner, .layerMinXMinYCorner]
@@ -28,7 +28,7 @@ final class QuantityView: UIView {
         let button = UIButton(type: .system)
         button.setImage(UIImage(systemName: "plus", withConfiguration: configForButton), for: .normal)
         button.tintColor = AppColorEnum.lightWhite.color
-        button.backgroundColor = AppColorEnum.tfBg.color
+        button.backgroundColor = AppColorEnum.veryDarkGreen.color
         button.layer.cornerRadius = 8
         button.layer.maskedCorners = [.layerMaxXMaxYCorner, .layerMaxXMinYCorner]
         button.addTarget(self, action: #selector(plusButtonTapped), for: .touchUpInside)

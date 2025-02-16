@@ -25,7 +25,7 @@ final class ExplorerListCollectionViewCell: UICollectionViewCell {
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
         imageView.translatesAutoresizingMaskIntoConstraints = false
-        imageView.backgroundColor = AppColorEnum.cellBackground.color
+        imageView.backgroundColor = AppColorEnum.lightGreen.color
         imageView.alpha = 0
         return imageView
     }()
@@ -45,7 +45,7 @@ final class ExplorerListCollectionViewCell: UICollectionViewCell {
     
     // MARK: Setup
     private func setupContentView() {
-        contentView.backgroundColor = AppColorEnum.cellBackground.color
+        contentView.backgroundColor = AppColorEnum.lightGreen.color
         contentView.layer.cornerRadius = cornerRadius
         productImageView.layer.cornerRadius = cornerRadius
         contentView.addSubview(productImageView)

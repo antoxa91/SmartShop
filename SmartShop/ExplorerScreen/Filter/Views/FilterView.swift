@@ -45,7 +45,7 @@ final class FilterView: UIView {
     
     private lazy var resetButton: UIButton = {
         let button = UIButton(type: .system)
-        button.tintColor = .black
+        button.tintColor = AppColorEnum.black.color
         button.layer.cornerRadius = Constants.resetButtonWidth / 2
         button.setImage(.init(systemName: "arrow.clockwise"), for: .normal)
         button.addTarget(self, action: #selector(resetButtonTapped), for: .touchUpInside)
@@ -58,15 +58,15 @@ final class FilterView: UIView {
         button.setTitle("Apply Filters", for: .normal)
         button.titleLabel?.font = .boldSystemFont(ofSize: Constants.applyButtonFontSize)
         button.setTitleColor(AppColorEnum.lightWhite.color, for: .normal)
-        button.backgroundColor = AppColorEnum.top.color
-        button.layer.borderColor = AppColorEnum.tfBg.color.cgColor
+        button.backgroundColor = AppColorEnum.green.color
+        button.layer.borderColor = AppColorEnum.veryDarkGreen.color.cgColor
         button.layer.borderWidth = Constants.applyButtonBorderWidth
         button.layer.cornerRadius = Constants.applyButtonCornerRadius
         button.addTarget(self, action: #selector(applyButtonTapped), for: .touchUpInside)
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
-
+    
     private lazy var mainStackView: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .vertical
@@ -95,7 +95,7 @@ final class FilterView: UIView {
     
     // MARK: Setup UI
     private func setupUI() {
-        backgroundColor = AppColorEnum.cellBackground.color
+        backgroundColor = AppColorEnum.lightGreen.color
         let priceStackView = createHorizontalStackView(arrangedSubviews: [priceLabel, priceTextField])
         let minMaxPriceStackView = createHorizontalStackView(arrangedSubviews: [priceFromLabel, minPriceTextField, priceToLabel, maxPriceTextField])
         mainStackView.addArrangedSubview(priceStackView)

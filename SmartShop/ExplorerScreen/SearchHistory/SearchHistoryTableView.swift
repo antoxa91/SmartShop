@@ -35,7 +35,7 @@ final class SearchHistoryTableView: UITableView {
         layer.masksToBounds = true
         translatesAutoresizingMaskIntoConstraints = false
         rowHeight = 30
-        backgroundColor = AppColorEnum.tfBg.color
+        backgroundColor = AppColorEnum.veryDarkGreen.color
         alpha = 0
         bounces = false
         separatorStyle = .singleLine
@@ -60,9 +60,9 @@ extension SearchHistoryTableView: UITableViewDataSource {
         let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier, for: indexPath)
         cell.textLabel?.text = searchHistory[indexPath.row]
         cell.textLabel?.textColor = AppColorEnum.lightWhite.color
-        cell.backgroundColor = AppColorEnum.tfBg.color
+        cell.backgroundColor = AppColorEnum.veryDarkGreen.color
         let selectedBackgroundView = UIView()
-        selectedBackgroundView.backgroundColor = AppColorEnum.appBackground.color
+        selectedBackgroundView.backgroundColor = AppColorEnum.darkGreen.color
         cell.selectedBackgroundView = selectedBackgroundView
         
         return cell

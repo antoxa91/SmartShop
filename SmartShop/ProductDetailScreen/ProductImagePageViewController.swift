@@ -40,7 +40,7 @@ final class ProductImagePageViewController: UIPageViewController {
     
     private func setupPageControl() {
         pageControl.translatesAutoresizingMaskIntoConstraints = false
-        pageControl.currentPageIndicatorTintColor = AppColorEnum.top.color
+        pageControl.currentPageIndicatorTintColor = AppColorEnum.green.color
         pageControl.pageIndicatorTintColor = AppColorEnum.gray.color
         pageControl.hidesForSinglePage = true
         view.addSubview(pageControl)
