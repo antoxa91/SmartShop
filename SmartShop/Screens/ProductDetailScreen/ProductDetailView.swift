@@ -9,7 +9,7 @@ import UIKit
 import OSLog
 
 protocol ProductDetailViewDelegate: AnyObject {
-    func didTapAddToCart()
+    func didTapAddToCart(quantity: Int)
 }
 
 final class ProductDetailView: UIView {
@@ -27,7 +27,7 @@ final class ProductDetailView: UIView {
     
     // MARK: Private UI Properties
     private let productImagePageViewController: ProductImagePageViewController
-
+    
     private lazy var descriptionLabel = ProductLabel(font: .systemFont(ofSize: 18, weight: .bold),
                                                      numberOfLines: 0)
     private lazy var priceLabel = ProductLabel(textColor: AppColorEnum.salad.color,
@@ -62,6 +62,7 @@ final class ProductDetailView: UIView {
     }()
     
     private lazy var quantityView = QuantityView()
+    private var isAddedToCart = false
     
     // MARK: Init
     init(frame: CGRect = .zero,
@@ -86,6 +87,7 @@ final class ProductDetailView: UIView {
         addSubviews(productImagePageViewController.view, scrollView, addToCartButton, quantityView)
         scrollView.addSubviews(contentView, categoryLabel, descriptionLabel, priceLabel)
         configureAddToCartButton(isAddedToCart: false)
+        quantityView.delegate = self
     }
     
     private func configureAddToCartButton(isAddedToCart: Bool) {
@@ -125,7 +127,7 @@ final class ProductDetailView: UIView {
             productImagePageViewController.view.leadingAnchor.constraint(equalTo: leadingAnchor),
             productImagePageViewController.view.trailingAnchor.constraint(equalTo: trailingAnchor),
             productImagePageViewController.view.heightAnchor.constraint(equalTo: heightAnchor,
-                                                     multiplier: Constants.imageHeightMultiplier),
+                                                                        multiplier: Constants.imageHeightMultiplier),
             
             scrollView.topAnchor.constraint(equalTo: productImagePageViewController.view.bottomAnchor),
             scrollView.leadingAnchor.constraint(equalTo: leadingAnchor),
@@ -177,8 +179,12 @@ final class ProductDetailView: UIView {
     
     // MARK: Action
     @objc private func addToCartButtonTapped() {
-        configureAddToCartButton(isAddedToCart: true)
-        delegate?.didTapAddToCart()
+        if isAddedToCart {
+            delegate?.didTapAddToCart(quantity: quantityView.counter)
+        } else {
+            configureAddToCartButton(isAddedToCart: true)
+            isAddedToCart = true
+        }
     }
 }
 
@@ -191,5 +197,12 @@ extension ProductDetailView: ConfigurableViewProtocol {
         priceLabel.text = "$ \(model.price)"
         categoryLabel.text = "Category -> \(model.category.name)"
         productImagePageViewController.configure(with: model.images)
+    }
+}
+
+// MARK: - QuantityViewDelegate
+extension ProductDetailView: QuantityViewDelegate {
+    func updateCounter(to quantity: Int) {
+        quantityView.counter = quantity
     }
 }
