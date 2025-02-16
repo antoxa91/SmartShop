@@ -159,7 +159,7 @@ extension ExplorerListView: BottomSheetDelegate {
         filterViewController.delegate = self
         
         if let sheet = filterViewController.sheetPresentationController {
-            sheet.detents = [.medium(), .large()]
+            sheet.detents = [.large()]
             sheet.preferredCornerRadius = 32
             sheet.prefersGrabberVisible = true
         }
