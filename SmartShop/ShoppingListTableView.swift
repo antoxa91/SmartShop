@@ -55,11 +55,41 @@ extension ShoppingListTableView: UITableViewDataSource {
         cell.configure(with: cartItem.product, quantity: cartItem.quantity)
         return cell
     }
+    
+    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+        if editingStyle == .delete {
+            cartItem.remove(at: indexPath.row)
+            tableView.deleteRows(at: [indexPath], with: .automatic)
+        }
+    }
 }
 
 // MARK: - UITableViewDelegate
 extension ShoppingListTableView: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         deselectRow(at: indexPath, animated: true)
+    }
+    
+    func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        let deleteAction = UIContextualAction(style: .destructive, title: "Delete") { (_, _, completionHandler) in
+            if let cell = tableView.cellForRow(at: indexPath) {
+                UIView.animate(withDuration: 0.5, animations: {
+                    cell.transform = .init(scaleX: 0.1, y: 0.1)
+                    cell.alpha = 0
+                    cell.layer.zPosition = -1
+                }, completion: { _ in
+                    self.cartItem.remove(at: indexPath.row)
+                    tableView.deleteRows(at: [indexPath], with: .automatic)
+                    completionHandler(true)
+                })
+            } else {
+                self.cartItem.remove(at: indexPath.row)
+                tableView.deleteRows(at: [indexPath], with: .automatic)
+                completionHandler(true)
+            }
+        }
+        
+        deleteAction.backgroundColor = .red
+        return UISwipeActionsConfiguration(actions: [deleteAction])
     }
 }
