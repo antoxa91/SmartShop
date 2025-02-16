@@ -14,17 +14,32 @@ protocol ShoppingListViewControllerDelegate: AnyObject {
 }
 
 protocol ShoppingCartManagerProtocol {
-    var cartItems: [CartItem] { get set }
+    var cartItems: [CartItem] { get }
+    func addCartItem(_ item: CartItem)
+    func removeCartItem(at index: Int)
+    func clearCartItems()
     func calculateTotalCost() -> Double
     func generateShoppingListText() -> String
-    func clearCartItems()
 }
 
 final class ShoppingCartManager: ShoppingCartManagerProtocol {
-    var cartItems: [CartItem]
+    private(set) var cartItems: [CartItem] = []
+    static let shared = ShoppingCartManager()
+
+    func addCartItem(_ item: CartItem) {
+        if let index = cartItems.firstIndex(where: { $0.product.id == item.product.id }) {
+            cartItems[index].quantity += item.quantity
+        } else {
+            cartItems.append(item)
+        }
+    }
     
-    init(cartItems: [CartItem]) {
-        self.cartItems = cartItems
+    func removeCartItem(at index: Int) {
+        cartItems.remove(at: index)
+    }
+    
+    func clearCartItems() {
+        cartItems.removeAll()
     }
     
     func calculateTotalCost() -> Double {
@@ -32,16 +47,6 @@ final class ShoppingCartManager: ShoppingCartManagerProtocol {
     }
     
     func generateShoppingListText() -> String {
-        return cartItems.map { cartItem in
-            """
-            Title: \(cartItem.product.title)
-            Quantity: \(cartItem.quantity)
-            Price: \(Double(cartItem.product.price) * Double(cartItem.quantity)) $
-            """
-        }.joined(separator: "\n\n")
-    }
-    
-    func clearCartItems() {
-        cartItems.removeAll()
+        return cartItems.map { "\($0.product.title) - \($0.quantity) pcs" }.joined(separator: "\n")
     }
 }

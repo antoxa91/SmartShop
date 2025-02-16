@@ -12,8 +12,8 @@ final class ShoppingListViewController: UIViewController {
     // MARK: Properties
     weak var delegate: ShoppingListViewControllerDelegate?
     private var shoppingCartManager: ShoppingCartManagerProtocol
-    
-    private lazy var shoppingListTableView = ShoppingListTableView(cartItems: shoppingCartManager.cartItems)
+
+    lazy var shoppingListTableView = ShoppingListTableView(cartItems: shoppingCartManager.cartItems)
     private lazy var deleteAllButton: UIButton = {
         let button = UIButton(type: .system)
         var config = UIButton.Configuration.tinted()
@@ -31,10 +31,10 @@ final class ShoppingListViewController: UIViewController {
     }()
     
     // MARK: Init
-    init(cartItems: [CartItem]) {
-        self.shoppingCartManager = ShoppingCartManager(cartItems: cartItems)
-        super.init(nibName: nil, bundle: nil)
-    }
+    init(shoppingCartManager: ShoppingCartManagerProtocol) {
+         self.shoppingCartManager = shoppingCartManager
+         super.init(nibName: nil, bundle: nil)
+     }
     
     @available(*, unavailable)
     required init?(coder: NSCoder) {
@@ -47,6 +47,12 @@ final class ShoppingListViewController: UIViewController {
         setup()
         setupNavigationBar()
         setConstraints()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        shoppingListTableView.cartItems = shoppingCartManager.cartItems
+        shoppingListTableView.reloadData()
     }
     
     // MARK: Setup
@@ -65,8 +71,8 @@ final class ShoppingListViewController: UIViewController {
     private func setConstraints() {
         NSLayoutConstraint.activate([
             shoppingListTableView.widthAnchor.constraint(equalTo: view.widthAnchor),
-            shoppingListTableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            shoppingListTableView.bottomAnchor.constraint(equalTo: deleteAllButton.topAnchor),
+            shoppingListTableView.topAnchor.constraint(equalTo: view.topAnchor),
+            shoppingListTableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
             
             deleteAllButton.heightAnchor.constraint(equalToConstant: 50),
             deleteAllButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
@@ -95,9 +101,10 @@ final class ShoppingListViewController: UIViewController {
     @objc private func deleteShoppingList() {
         let alertController = UIAlertController(title: "Clean the Shopping List?", message: "Are you sure?", preferredStyle: .alert)
         let deleteAction = UIAlertAction(title: "Clean", style: .destructive) { [weak self] _ in
-            self?.shoppingCartManager.clearCartItems()
-            self?.shoppingListTableView.clearCartItems()
-            self?.delegate?.shoppingListViewControllerDidRequestDeleteAll(self!)
+            guard let self else { return }
+            self.shoppingCartManager.clearCartItems()
+            self.shoppingListTableView.clearCartItems()
+            self.delegate?.shoppingListViewControllerDidRequestDeleteAll(self)
         }
         let cancelAction = UIAlertAction(title: "Cancel", style: .cancel)
         alertController.addAction(deleteAction)

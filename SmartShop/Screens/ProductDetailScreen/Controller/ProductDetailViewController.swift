@@ -70,9 +70,9 @@ final class ProductDetailViewController: UIViewController {
 extension ProductDetailViewController: ProductDetailViewDelegate {
     func didTapAddToCart(quantity: Int) {
         Logger.productDetailVC.info("User added to cart product: \(self.product.title) with quantity: \(quantity)")
-        
         let cartItem = CartItem(product: product, quantity: quantity)
-        let shoppingListVC = ShoppingListViewController(cartItems: [cartItem])
+        ShoppingCartManager.shared.addCartItem(cartItem)
+        let shoppingListVC = ShoppingListViewController(shoppingCartManager: ShoppingCartManager.shared)
         navigationController?.pushViewController(shoppingListVC, animated: true)
     }
 }

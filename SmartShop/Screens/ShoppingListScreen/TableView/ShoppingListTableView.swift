@@ -13,7 +13,7 @@ protocol ShoppingListTableViewDelegate: AnyObject {
 
 final class ShoppingListTableView: UITableView {
     weak var shoppingListTableViewDelegate: ShoppingListTableViewDelegate?
-    private var cartItems: [CartItem] = []
+    var cartItems: [CartItem] = []
     
     // MARK: Init
     init(cartItems: [CartItem]) {
