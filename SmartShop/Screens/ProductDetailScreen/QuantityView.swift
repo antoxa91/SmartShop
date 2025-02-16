@@ -7,9 +7,17 @@
 
 import UIKit
 
+protocol QuantityViewDelegate: AnyObject {
+    func updateCounter(to quantity: Int)
+}
+
 final class QuantityView: UIView {
+    weak var delegate: QuantityViewDelegate?
+    
     // MARK: Private UI Properties
-    private lazy var counterLabel = ProductLabel(text: "1", font: .systemFont(ofSize: 18, weight: .semibold), textAlignment: .center)
+    private lazy var counterLabel = ProductLabel(text: "1",
+                                                 font: .systemFont(ofSize: 18, weight: .semibold),
+                                                 textAlignment: .center)
     
     private let configForButton = UIImage.SymbolConfiguration(pointSize: 20, weight: .regular, scale: .default)
     private lazy var minusButton: UIButton = {
@@ -20,6 +28,7 @@ final class QuantityView: UIView {
         button.layer.cornerRadius = 8
         button.layer.maskedCorners = [.layerMinXMaxYCorner, .layerMinXMinYCorner]
         button.addTarget(self, action: #selector(minusButtonTapped), for: .touchUpInside)
+        button.isEnabled = false
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
@@ -36,7 +45,7 @@ final class QuantityView: UIView {
         return button
     }()
     
-    private var counter = 1 {
+    var counter = 1 {
         didSet {
             UIView.transition(with: self.counterLabel, duration: 0.3, options: .transitionFlipFromBottom, animations: { [weak self] in
                 guard let self else { return }
@@ -48,7 +57,6 @@ final class QuantityView: UIView {
     // MARK: Init
     override init(frame: CGRect) {
         super.init(frame: frame)
-        
         setup()
         setConstraints()
     }
@@ -93,16 +101,15 @@ final class QuantityView: UIView {
     @objc private func minusButtonTapped() {
         animateButton(minusButton)
         counter -= 1
-        
-        if counter <= 1 {
-            minusButton.isEnabled = false
-        }
+        minusButton.isEnabled = counter > 1
+        delegate?.updateCounter(to: counter)
     }
     
     @objc func plusButtonTapped() {
         animateButton(plusButton)
         counter += 1
         minusButton.isEnabled = true
+        delegate?.updateCounter(to: counter)
     }
     
     // MARK: Animation

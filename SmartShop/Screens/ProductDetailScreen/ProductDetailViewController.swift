@@ -9,7 +9,6 @@ import UIKit
 import OSLog
 
 final class ProductDetailViewController: UIViewController {
-    
     private let product: Product
     private let imageLoader: ImageLoaderProtocol
     private lazy var productDetailView = ProductDetailView(imageLoader: imageLoader)
@@ -28,7 +27,6 @@ final class ProductDetailViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         setupView()
         setConstraints()
     }
@@ -40,6 +38,7 @@ final class ProductDetailViewController: UIViewController {
         view.addSubview(productDetailView)
         productDetailView.configure(with: product)
         productDetailView.delegate = self
+        navigationItem.backButtonDisplayMode = .minimal
         navigationItem.rightBarButtonItem = .init(barButtonSystemItem: .action, target: self, action:  #selector(shareProduct))
     }
     
@@ -65,12 +64,15 @@ final class ProductDetailViewController: UIViewController {
         present(activityViewController, animated: true, completion: nil)
         Logger.productDetailVC.info("User shared product: \(self.product.title)")
     }
-    
 }
 
 // MARK: - ProductDetailViewDelegate
 extension ProductDetailViewController: ProductDetailViewDelegate {
-    func didTapAddToCart() {
-        Logger.productDetailVC.info("User add to card product: \(self.product.title)")
+    func didTapAddToCart(quantity: Int) {
+        Logger.productDetailVC.info("User added to cart product: \(self.product.title) with quantity: \(quantity)")
+        
+        let cartItem = CartItem(product: product, quantity: quantity)
+        let shoppingListVC = ShoppingListViewController(cartItems: [cartItem])
+        navigationController?.pushViewController(shoppingListVC, animated: true)
     }
 }
