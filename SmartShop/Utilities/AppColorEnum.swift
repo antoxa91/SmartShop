@@ -19,6 +19,8 @@ enum AppColorEnum {
     case gray
     case lightGray
     case black
+    case pink
+    case red
     
     var color: UIColor {
         switch self {
@@ -44,6 +46,10 @@ enum AppColorEnum {
             return UIColor(hex: "#E5E5E5")
         case .black:
             return .black
+        case .pink:
+            return .systemPink
+        case .red:
+            return .systemRed
         }
     }
 }

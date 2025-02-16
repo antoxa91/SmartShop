@@ -37,6 +37,7 @@ final class ShoppingListTableView: UITableView {
         backgroundColor = AppColorEnum.lightWhite.color
         separatorStyle = .singleLine
         separatorColor = .lightGray
+        translatesAutoresizingMaskIntoConstraints = false
         bounces = false
     }
     
@@ -75,6 +76,15 @@ extension ShoppingListTableView: UITableViewDataSource {
             tableView.deleteRows(at: [indexPath], with: .automatic)
         }
     }
+    
+    func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
+        let movedItem = cartItems.remove(at: sourceIndexPath.row)
+        cartItems.insert(movedItem, at: destinationIndexPath.row)
+    }
+    
+    func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
+        return true
+    }
 }
 
 // MARK: - UITableViewDelegate
@@ -104,5 +114,9 @@ extension ShoppingListTableView: UITableViewDelegate {
         
         deleteAction.backgroundColor = .red
         return UISwipeActionsConfiguration(actions: [deleteAction])
+    }
+    
+    func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCell.EditingStyle {
+        return .none
     }
 }
