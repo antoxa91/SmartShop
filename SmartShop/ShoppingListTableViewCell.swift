@@ -76,7 +76,8 @@ final class ShoppingListTableViewCell: UITableViewCell {
                                                      constant: -Constants.defaultPadding),
             productImageView.widthAnchor.constraint(equalTo: heightAnchor),
             
-            quantityView.trailingAnchor.constraint(equalTo: priceLabel.leadingAnchor, constant: -16),
+            quantityView.trailingAnchor.constraint(equalTo: priceLabel.leadingAnchor,
+                                                   constant: -Constants.defaultPadding*2),
             quantityView.widthAnchor.constraint(equalTo: widthAnchor,
                                                 multiplier: Constants.quantityViewWidthMultiplier),
             quantityView.heightAnchor.constraint(equalTo: heightAnchor,
