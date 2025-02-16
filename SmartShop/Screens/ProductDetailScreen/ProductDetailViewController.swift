@@ -64,7 +64,6 @@ final class ProductDetailViewController: UIViewController {
         present(activityViewController, animated: true, completion: nil)
         Logger.productDetailVC.info("User shared product: \(self.product.title)")
     }
-    
 }
 
 // MARK: - ProductDetailViewDelegate
