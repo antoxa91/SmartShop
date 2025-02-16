@@ -39,6 +39,19 @@ final class ShoppingListTableView: UITableView {
         separatorColor = .lightGray
         bounces = false
     }
+    
+    // MARK: Action
+    func clearCartItems() {
+        UIView.animate(withDuration: 0.5, animations: {
+            for cell in self.visibleCells {
+                cell.transform = CGAffineTransform(scaleX: 0.1, y: 0.1)
+                cell.alpha = 0
+            }
+        }, completion: { [weak self] _ in
+            self?.cartItems.removeAll()
+            self?.reloadData()
+        })
+    }
 }
 
 // MARK: - UITableViewDataSource

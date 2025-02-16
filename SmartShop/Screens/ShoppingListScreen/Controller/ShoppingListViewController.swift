@@ -9,7 +9,6 @@ import UIKit
 import OSLog
 
 final class ShoppingListViewController: UIViewController {
-    
     // MARK: Properties
     private let shoppingListTableView: ShoppingListTableView
     private var cartItems: [CartItem]
@@ -36,8 +35,7 @@ final class ShoppingListViewController: UIViewController {
         setup()
     }
     
-    // MARK: - Setup
-    
+    // MARK: Setup
     private func setup() {
         view.backgroundColor = AppColorEnum.lightWhite.color
         title = "Shopping List"
@@ -46,11 +44,11 @@ final class ShoppingListViewController: UIViewController {
     
     private func setupNavigationBar() {
         let shareButton = UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(shareShoppingList))
-        navigationItem.rightBarButtonItem = shareButton
+        let deleteButton = UIBarButtonItem(barButtonSystemItem: .trash, target: self, action: #selector(deleteShoppingList))
+        navigationItem.setRightBarButtonItems([deleteButton, shareButton], animated: true)
     }
     
-    // MARK: - Actions
-    
+    // MARK: Actions
     @objc private func shareShoppingList() {
         let totalCost = calculateTotalCost()
         let shoppingListText = generateShoppingListText()
@@ -60,8 +58,20 @@ final class ShoppingListViewController: UIViewController {
         present(activityViewController, animated: true)
     }
     
-    // MARK: - Helpers
+    @objc private func deleteShoppingList() {
+        let alertController = UIAlertController(title: "Clean the Shopping List?", message: "Are you sure?", preferredStyle: .alert)
+        let deleteAction = UIAlertAction(title: "Clean", style: .destructive) { [weak self] _ in
+            self?.cartItems.removeAll()
+            self?.shoppingListTableView.clearCartItems()
+        }
+        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel)
+        alertController.addAction(deleteAction)
+        alertController.addAction(cancelAction)
+        present(alertController, animated: true)
+    }
+
     
+    // MARK: Helpers
     private func calculateTotalCost() -> Double {
         return cartItems.reduce(0) { $0 + (Double($1.product.price) * Double($1.quantity)) }
     }
