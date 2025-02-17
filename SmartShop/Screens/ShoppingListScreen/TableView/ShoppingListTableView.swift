@@ -74,12 +74,14 @@ extension ShoppingListTableView: UITableViewDataSource {
         if editingStyle == .delete {
             cartItems.remove(at: indexPath.row)
             tableView.deleteRows(at: [indexPath], with: .automatic)
+            ShoppingCartManager.shared.removeCartItem(at: indexPath.row)
         }
     }
     
     func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
         let movedItem = cartItems.remove(at: sourceIndexPath.row)
         cartItems.insert(movedItem, at: destinationIndexPath.row)
+        ShoppingCartManager.shared.updateCartItems(cartItems)
     }
     
     func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {

@@ -18,6 +18,7 @@ protocol ShoppingCartManagerProtocol {
     var cartItems: [CartItem] { get }
     func addCartItem(_ item: CartItem)
     func removeCartItem(at index: Int)
+    func updateCartItems(_ items: [CartItem])
     func clearCartItems()
     func calculateTotalCost() -> Double
     func generateShoppingListText() -> String
@@ -71,6 +72,11 @@ extension ShoppingCartManager: ShoppingCartManagerProtocol {
     
     func clearCartItems() {
         cartItems.removeAll()
+        saveCartItems()
+    }
+    
+    func updateCartItems(_ items: [CartItem]) {
+        cartItems = items
         saveCartItems()
     }
     
