@@ -53,10 +53,23 @@ final class ShoppingListTableViewCell: UITableViewCell {
     
     // MARK: Setup
     private func setupContentView() {
-        contentView.backgroundColor = AppColorEnum.lightWhite.color
         contentView.addSubviews(productImageView, quantityView, priceLabel)
         productImageView.layer.cornerRadius = Constants.imageCornerRadius
         quantityView.delegate = self
+        backgroundColor = AppColorEnum.lightWhite.color
+    }
+    
+    override func setEditing(_ editing: Bool, animated: Bool) {
+        super.setEditing(editing, animated: animated)
+        
+        if editing {
+            self.layer.shadowColor = AppColorEnum.green.color.cgColor
+            self.layer.shadowOpacity = 0.6
+            self.layer.shadowOffset = CGSize(width: 0, height: 2)
+            self.layer.shadowRadius = 4
+        } else {
+            self.layer.shadowOpacity = 0
+        }
     }
     
     override func prepareForReuse() {
@@ -77,7 +90,7 @@ final class ShoppingListTableViewCell: UITableViewCell {
             productImageView.widthAnchor.constraint(equalTo: heightAnchor),
             
             quantityView.leadingAnchor.constraint(equalTo: productImageView.trailingAnchor,
-                                                   constant: Constants.defaultPadding*3),
+                                                  constant: Constants.defaultPadding*3),
             quantityView.widthAnchor.constraint(equalTo: widthAnchor,
                                                 multiplier: Constants.quantityViewWidthMultiplier),
             quantityView.heightAnchor.constraint(equalTo: heightAnchor,
