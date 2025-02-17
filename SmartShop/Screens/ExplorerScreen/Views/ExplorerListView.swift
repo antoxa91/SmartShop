@@ -89,11 +89,9 @@ final class ExplorerListView: UIView {
         basketView.addGestureRecognizer(tapGesture)
         tapGesture.cancelsTouchesInView = false
         basketView.isUserInteractionEnabled = true
-        print("setupBasketViewTapGesture")
     }
     
     @objc private func basketViewTapped() {
-        print("basketViewTapped")
         delegate?.pushShoppingListViewController()
     }
     
