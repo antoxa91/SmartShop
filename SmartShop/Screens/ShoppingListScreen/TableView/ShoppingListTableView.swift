@@ -74,7 +74,6 @@ extension ShoppingListTableView: UITableViewDataSource {
         if editingStyle == .delete {
             cartItems.remove(at: indexPath.row)
             tableView.deleteRows(at: [indexPath], with: .automatic)
-            ShoppingCartManager.shared.removeCartItem(at: indexPath.row)
         }
     }
     
@@ -105,6 +104,7 @@ extension ShoppingListTableView: UITableViewDelegate {
                 }, completion: { _ in
                     self.cartItems.remove(at: indexPath.row)
                     tableView.deleteRows(at: [indexPath], with: .automatic)
+                    ShoppingCartManager.shared.removeCartItem(at: indexPath.row)
                     completionHandler(true)
                 })
             } else {
