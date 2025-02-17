@@ -8,7 +8,7 @@
 import UIKit
 
 protocol ShoppingListTableViewDelegate: AnyObject {
-    func didSelectShoppingItem(_ item: String)
+    func didSelectShoppingItem(_ item: CartItem)
 }
 
 final class ShoppingListTableView: UITableView {
@@ -92,6 +92,8 @@ extension ShoppingListTableView: UITableViewDataSource {
 extension ShoppingListTableView: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         deselectRow(at: indexPath, animated: true)
+        let selectedItem = cartItems[indexPath.row]
+        shoppingListTableViewDelegate?.didSelectShoppingItem(selectedItem)
     }
     
     func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {

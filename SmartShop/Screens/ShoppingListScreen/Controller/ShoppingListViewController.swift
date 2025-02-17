@@ -12,8 +12,9 @@ final class ShoppingListViewController: UIViewController {
     // MARK: Properties
     weak var delegate: ShoppingListViewControllerDelegate?
     private var shoppingCartManager: ShoppingCartManagerProtocol
-
-    lazy var shoppingListTableView = ShoppingListTableView(cartItems: shoppingCartManager.cartItems)
+    private let imageLoader: ImageLoaderProtocol = ImageLoaderService()
+    
+    private lazy var shoppingListTableView = ShoppingListTableView(cartItems: shoppingCartManager.cartItems)
     private lazy var deleteAllButton: UIButton = {
         let button = UIButton(type: .system)
         var config = UIButton.Configuration.tinted()
@@ -60,6 +61,7 @@ final class ShoppingListViewController: UIViewController {
         view.backgroundColor = AppColorEnum.lightWhite.color
         title = "Shopping List"
         view.addSubviews(shoppingListTableView, deleteAllButton)
+        shoppingListTableView.shoppingListTableViewDelegate = self
     }
     
     private func setupNavigationBar() {
@@ -110,5 +112,13 @@ final class ShoppingListViewController: UIViewController {
         alertController.addAction(deleteAction)
         alertController.addAction(cancelAction)
         present(alertController, animated: true)
+    }
+}
+
+// MARK: - ShoppingListTableViewDelegate
+extension ShoppingListViewController: ShoppingListTableViewDelegate {
+    func didSelectShoppingItem(_ item: CartItem) {
+        let productDetailVC = ProductDetailViewController(product: item.product, imageLoader: imageLoader)
+        navigationController?.pushViewController(productDetailVC, animated: true)
     }
 }
