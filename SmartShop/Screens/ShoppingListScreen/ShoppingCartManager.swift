@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import OSLog
 
 protocol ShoppingListViewControllerDelegate: AnyObject {
     func shoppingListViewControllerDidToggleEditing(_ viewController: ShoppingListViewController, isEditing: Bool)
@@ -22,7 +23,7 @@ protocol ShoppingCartManagerProtocol {
     func generateShoppingListText() -> String
 }
 
-final class ShoppingCartManager: ShoppingCartManagerProtocol {
+final class ShoppingCartManager {
     private(set) var cartItems: [CartItem] = []
     static let shared = ShoppingCartManager()
     private let fileURL: URL
@@ -33,6 +34,27 @@ final class ShoppingCartManager: ShoppingCartManagerProtocol {
         loadCartItems()
     }
     
+    private func saveCartItems() {
+        do {
+            let data = try JSONEncoder().encode(cartItems)
+            try data.write(to: fileURL)
+        } catch {
+            Logger.shoppingCartManager.error("Failed to save cart items: \(error)")
+        }
+    }
+    
+    private func loadCartItems() {
+        do {
+            let data = try Data(contentsOf: fileURL)
+            cartItems = try JSONDecoder().decode([CartItem].self, from: data)
+        } catch {
+            Logger.shoppingCartManager.error("Failed to load cart items: \(error)")
+        }
+    }
+}
+
+// MARK: - ShoppingCartManagerProtocol
+extension ShoppingCartManager: ShoppingCartManagerProtocol {
     func addCartItem(_ item: CartItem) {
         if let index = cartItems.firstIndex(where: { $0.product.id == item.product.id }) {
             cartItems[index].quantity += item.quantity
@@ -58,23 +80,5 @@ final class ShoppingCartManager: ShoppingCartManagerProtocol {
     
     func generateShoppingListText() -> String {
         return cartItems.map { "\($0.product.title) - \($0.quantity) pcs" }.joined(separator: "\n")
-    }
-    
-    private func saveCartItems() {
-        do {
-            let data = try JSONEncoder().encode(cartItems)
-            try data.write(to: fileURL)
-        } catch {
-            print("Failed to save cart items: \(error)")
-        }
-    }
-    
-    private func loadCartItems() {
-        do {
-            let data = try Data(contentsOf: fileURL)
-            cartItems = try JSONDecoder().decode([CartItem].self, from: data)
-        } catch {
-            print("Failed to load cart items: \(error)")
-        }
     }
 }

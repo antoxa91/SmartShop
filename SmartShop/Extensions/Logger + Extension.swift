@@ -18,4 +18,5 @@ extension Logger {
     static let emptyState = Logger(subsystem: appIdentifier, category: "emptyState")
     static let productDetailVC = Logger(subsystem: appIdentifier, category: "productDetailVC")
     static let productImagePageVC = Logger(subsystem: appIdentifier, category: "ProductImagePageVC")
+    static let shoppingCartManager = Logger(subsystem: appIdentifier, category: "ProductImagePageVC")
 }
