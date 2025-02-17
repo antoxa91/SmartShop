@@ -12,6 +12,7 @@ protocol ExplorerListViewDelegate: AnyObject {
     func presentBottomSheet(_ viewController: UIViewController)
     func pushDetailVC(_ productListView: ExplorerListView,
                       didSelectProduct product: Product)
+    func pushShoppingListViewController()
 }
 
 final class ExplorerListView: UIView {
@@ -43,6 +44,7 @@ final class ExplorerListView: UIView {
         configureViewModel()
         configureSearchTextField()
         setupTapGestureRecognizer()
+        setupBasketViewTapGesture()
     }
     
     @available(*, unavailable)
@@ -80,6 +82,19 @@ final class ExplorerListView: UIView {
         UIView.animate(withDuration: 0.3) {
             self.dropdownTableView.alpha = 0
         }
+    }
+    
+    private func setupBasketViewTapGesture() {
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(basketViewTapped))
+        basketView.addGestureRecognizer(tapGesture)
+        tapGesture.cancelsTouchesInView = false
+        basketView.isUserInteractionEnabled = true
+        print("setupBasketViewTapGesture")
+    }
+    
+    @objc private func basketViewTapped() {
+        print("basketViewTapped")
+        delegate?.pushShoppingListViewController()
     }
     
     // MARK: Layout

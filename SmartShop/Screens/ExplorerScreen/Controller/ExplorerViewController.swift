@@ -65,4 +65,9 @@ extension ExplorerViewController: ExplorerListViewDelegate {
     func presentBottomSheet(_ viewController: UIViewController) {
         present(viewController, animated: true)
     }
+    
+    func pushShoppingListViewController() {
+        let shoppingListVC = ShoppingListViewController(shoppingCartManager: ShoppingCartManager.shared)
+        navigationController?.pushViewController(shoppingListVC, animated: true)
+    }
 }
